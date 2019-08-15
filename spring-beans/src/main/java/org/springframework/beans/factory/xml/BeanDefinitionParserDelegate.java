@@ -412,9 +412,12 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// id 属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
+		// 分割name属性视为alias
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
@@ -423,6 +426,7 @@ public class BeanDefinitionParserDelegate {
 
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			// 移除和id相同的的alias
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
 				logger.debug("No XML 'id' specified - using '" + beanName +
@@ -431,18 +435,20 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (containingBean == null) {
+			// 校验bean id的唯一性
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		// 解析bean标签为GenericBeanDefinition
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
 				try {
+					// 如果不存在beanName那么根据Spring中提供的命名规则为当前bean生成对应的beanName
 					if (containingBean != null) {
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
-					}
-					else {
+					} else {
 						beanName = this.readerContext.generateBeanName(beanDefinition);
 						// Register an alias for the plain bean class name, if still possible,
 						// if the generator returned the class name plus a suffix.
@@ -458,13 +464,13 @@ public class BeanDefinitionParserDelegate {
 						logger.debug("Neither XML 'id' nor 'name' specified - " +
 								"using generated bean name [" + beanName + "]");
 					}
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					error(ex.getMessage(), ele);
 					return null;
 				}
 			}
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
+			// 将GenericBeanDefinition放入BeanDefinitionHolder返回
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 
@@ -504,42 +510,56 @@ public class BeanDefinitionParserDelegate {
 
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
+			// 解析class属性
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
+			// 解析parent属性
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
 		try {
+			// 创建 GenericBeanDefinition 类型的 BeanDefinition，用new的方式创建的，代码就不贴了~
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
+			/*
+			 * 以下逻辑解析了bean标签所有属性封装在 GenericBeanDefinition 中，解析的代码很简单，不贴上来了~~
+			 */
+
+			// 解析 singleton、scope、abstract、lazy-init、autowire、
+			// depends-on、autowire-candidate、primary、init-method、
+			// destroy-method、factory-method、factory-bean 属性存在 BeanDefinition 中
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+			// 解析 description 属性
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
+			// 解析 meta 属性以及 key、value，封装成 BeanMetadataAttribute 存在 BeanDefinition 中
 			parseMetaElements(ele, bd);
+			// 解析 lookup-method 属性以及 name、bean，
+			// 封装成 LookupOverride 存在 BeanDefinition 的 MethodOverrides 中
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			// 解析 replaced-method 属性以及 name、replacer、arg-type、match，
+			// 封装成 ReplaceOverride 存在 BeanDefinition 的 MethodOverrides 中
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
-
+			// 解析 constructor-arg 属性
 			parseConstructorArgElements(ele, bd);
+			// 解析 property 属性
 			parsePropertyElements(ele, bd);
+			// 解析 qualifier 属性
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
 			bd.setSource(extractSource(ele));
 
 			return bd;
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			error("Bean class [" + className + "] not found", ele, ex);
-		}
-		catch (NoClassDefFoundError err) {
+		} catch (NoClassDefFoundError err) {
 			error("Class that bean class [" + className + "] depends on not found", ele, err);
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
 			error("Unexpected failure during bean definition parsing", ele, ex);
-		}
-		finally {
+		} finally {
 			this.parseState.pop();
 		}
 
@@ -1379,15 +1399,19 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		// 取得命名空间uri
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
+		// 用 命名空间uri 和 DefaultNamespaceHandlerResolver 解析出 NamespaceHandler
+		// this.readerContext.getNamespaceHandlerResolver()取得的是前文分析 spring.handlers 时创建的 DefaultNamespaceHandlerResolver
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		// 调用自定义命名空间处理器解析出BeanDefinition返回
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 

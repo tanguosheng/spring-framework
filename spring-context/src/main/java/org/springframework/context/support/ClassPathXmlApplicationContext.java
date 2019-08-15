@@ -137,10 +137,12 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-
+		// 把当前的父context设置进去，这里是null
 		super(parent);
+		// 将外面塞进来的配置文件路径设置进去，等待一会儿解析。
 		setConfigLocations(configLocations);
-		if (refresh) {
+		if (refresh) { // true
+			// 刷新。加载从这里开始
 			refresh();
 		}
 	}
