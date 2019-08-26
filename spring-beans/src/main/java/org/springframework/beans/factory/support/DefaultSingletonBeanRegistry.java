@@ -215,6 +215,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				 * 实例化C后发现C类包含有A类属性，那就直接从 earlySingletonObjects取得A就好了，
 				 * 这样拿到的A实例就能保证是同一个。
 				 * 解决了循环依赖问题。
+				 *
+				 * ObjectFactory 隐藏了bean的创建细节，在工厂中可能存在对bean的增强（AOP），
+				 * 如果需要AOP则返回AOP后的代理实例，如果无AOP直接返回bean本身实例
 				 */
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				if (singletonObject == null && allowEarlyReference) {
@@ -257,7 +260,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				// 添加正在创建状态
+				// 添加当前bean正在创建中状态
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -449,6 +452,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param dependentBeanName the name of the dependent bean
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+		// 确定原始名称，将别名解析为规范名称。
 		String canonicalName = canonicalName(beanName);
 
 		synchronized (this.dependentBeanMap) {

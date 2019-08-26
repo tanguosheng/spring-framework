@@ -286,7 +286,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// Eagerly check singleton cache for manually registered singletons.
 		// 积极地尝试从缓存中获取单例bean，可能拿不到bean
-		// bean没在缓存中并且bean也不在创建中 或 beanName对应的bean根本不存在 或 spring还没构建好 ObjectFactory，返回null
+		/*
+		 * bean没在缓存中并且bean也不在创建中（需要从头执行创建流程），返回null
+		 * 或 beanName对应的bean根本不存在，返回null
+		 * 或 bean正在创建中，但spring还没构建好 ObjectFactory，返回null
+		 * 后文还会调用此方法
+		 */
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			// 取到了实例
@@ -1812,11 +1817,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// DisposableBean interface, custom destroy method.
 				// 注册一个执行所有销毁的DisposableBean实现为给定的bean工作：DestructionAwareBeanPostProcessors，
 				// DisposableBean接口，自定义销毁方法。
+				/*
+				 * 单例模式下注册需要销毁的bean，此方法中会处理实现DisposableBean的bean,
+				 * 并且对所有的bean使用DestructionAwareBeanPostProcessors处理
+				 * DisposableBeanDestructionAwareBeanPostProcessors
+				 */
 				registerDisposableBean(beanName,
 						new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
 			} else {
 				// A bean with a custom scope...
 				// 具有自定义范围的bean ...
+				// 自定义scope的处理
 				Scope scope = this.scopes.get(mbd.getScope());
 				if (scope == null) {
 					throw new IllegalStateException("No Scope registered for scope name '" + mbd.getScope() + "'");
