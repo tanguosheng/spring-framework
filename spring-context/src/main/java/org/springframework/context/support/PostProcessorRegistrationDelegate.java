@@ -134,8 +134,8 @@ final class PostProcessorRegistrationDelegate {
 			// Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.
 			// 最后，调用所有其他 BeanDefinitionRegistryPostProcessors，直到不再出现其他BeanDefinitionRegistryPostProcessors
 			// 这里在不停的在工厂中取得BeanDefinitionRegistryPostProcessor类型的实例，
-			// 我想应该是在初始化context时，可能发生并发不停的注册新的Bean，
-			// 然而不能一直等着其他线程注册完，那就取到我再也取不到新的为止吧，继续往下进行。
+			// 我想应该是这里调用invokeBeanDefinitionRegistryPostProcessors时又触发新的BeanDefinitionRegistryPostProcessor实现类注册到容器中，
+			// 这里不停调用invokeBeanDefinitionRegistryPostProcessors方法直到没有更新的为止。
 			boolean reiterate = true;
 			while (reiterate) {
 				reiterate = false;
