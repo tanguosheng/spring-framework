@@ -1097,6 +1097,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					 *
 					 * 执行这个方法后，bean或许成为了一个经过处理的代理bean，
 					 * 可能是通过cglib生成的，也可能是通过其他技术生成的。
+					 * 可以参考下:
+					 * 	1. org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator.java
+					 * 	2. TargetSource 官方文档: https://docs.spring.io/spring/docs/5.0.18.RELEASE/spring-framework-reference/core.html#aop-targetsource
+					 * 	3. TargetSource 中文文档: https://www.php.cn/manual/view/21815.html
 					 */
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
@@ -1106,9 +1110,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						 * 而不再doCreatBean生成实例，直接返回bean。
 						 * 在返回bean前，尽可能地保证注册的 BeanPostProcessor 的
 						 * postProcessAfterInitialization() 方法可以执行。
-						 */
-
-						/*
+						 *
 						 * 执行所有 BeanPostProcessor 的 postProcessAfterInitialization() 方法
 						 */
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
