@@ -220,38 +220,37 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		}
 	}
 
-	javadoc {
-		description = "Generates project-level javadoc for use in -javadoc jar"
+//	文档和源码包打包相关
+//	javadoc {
+//		description = "Generates project-level javadoc for use in -javadoc jar"
+//		options.encoding = "UTF-8"
+//		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+//		options.author = true
+//		options.header = project.name
+//		options.use = true
+//		options.links(project.ext.javadocLinks)
+//		options.addStringOption("Xdoclint:none", "-quiet")
+//		// Suppress warnings due to cross-module @see and @link references.
+//		// Note that global 'api' task does display all warnings.
+//		logging.captureStandardError LogLevel.INFO
+//		logging.captureStandardOutput LogLevel.INFO  // suppress "## warnings" message
+//	}
+//	task sourcesJar(type: Jar, dependsOn: classes) {
+//		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//		classifier = "sources"
+//		from sourceSets.main.allSource
+//		// Don't include or exclude anything explicitly by default. See SPR-12085.
+//	}
+//	task javadocJar(type: Jar) {
+//		classifier = "javadoc"
+//		from javadoc
+//	}
+//	artifacts {
+//		archives sourcesJar
+//		archives javadocJar
+//	}
+//	文档和源码包打包相关 end
 
-		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
-		options.author = true
-		options.header = project.name
-		options.use = true
-		options.links(project.ext.javadocLinks)
-		options.addStringOption("Xdoclint:none", "-quiet")
-
-		// Suppress warnings due to cross-module @see and @link references.
-		// Note that global 'api' task does display all warnings.
-		logging.captureStandardError LogLevel.INFO
-		logging.captureStandardOutput LogLevel.INFO  // suppress "## warnings" message
-	}
-
-	task sourcesJar(type: Jar, dependsOn: classes) {
-		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-		classifier = "sources"
-		from sourceSets.main.allSource
-		// Don't include or exclude anything explicitly by default. See SPR-12085.
-	}
-
-	task javadocJar(type: Jar) {
-		classifier = "javadoc"
-		from javadoc
-	}
-
-	artifacts {
-		archives sourcesJar
-		archives javadocJar
-	}
 }
 
 configure(rootProject) {
