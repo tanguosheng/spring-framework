@@ -258,8 +258,9 @@ configure(rootProject) {
 	description = "Spring Framework"
 
 	apply plugin: "groovy"
-	apply from: "${gradleScriptDir}/jdiff.gradle"
-	apply from: "${gradleScriptDir}/docs.gradle"
+	// 在打包文档时，由于代码中有中文注释，就会报错。
+	// apply from: "${gradleScriptDir}/jdiff.gradle"
+	// apply from: "${gradleScriptDir}/docs.gradle"
 
 	dependencyManagement {
 		imports {
@@ -289,11 +290,12 @@ configure(rootProject) {
 		testCompile("org.hibernate:hibernate-core:5.1.17.Final")
 	}
 
-	artifacts {
-		archives docsZip
-		archives schemaZip
-		archives distZip
-	}
+// 在打包文档时，由于代码中有中文注释，就会报错。
+//	artifacts {
+//		archives docsZip
+//		archives schemaZip
+//		archives distZip
+//	}
 
 	task wrapper(type: Wrapper) {
 		description = "Generates gradlew[.bat] scripts"
