@@ -200,6 +200,11 @@ configure(allprojects) { project ->
 		"https://junit.org/junit4/javadoc/4.12/",
 		"https://junit.org/junit5/docs/${junitJupiterVersion}/api/"
 	] as String[]
+
+
+//	编译时，都是用统一字符集
+	compileJava.options.encoding = 'UTF-8'
+	compileTestJava.options.encoding = 'UTF-8'
 }
 
 configure(subprojects - project(":spring-build-src")) { subproject ->
@@ -251,6 +256,10 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 	}
 //	文档和源码包打包相关 end
 
+
+//	编译时，都是用统一字符集
+	compileJava.options.encoding = 'UTF-8'
+	compileTestJava.options.encoding = 'UTF-8'
 }
 
 configure(rootProject) {
