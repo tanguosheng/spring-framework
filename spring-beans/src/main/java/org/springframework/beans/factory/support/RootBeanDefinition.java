@@ -16,6 +16,15 @@
 
 package org.springframework.beans.factory.support;
 
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.springframework.core.ResolvableType;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
@@ -23,14 +32,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.core.ResolvableType;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 /**
  * A root bean definition represents the merged bean definition that backs
@@ -98,8 +99,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied */
 	boolean postProcessed = false;
 
-	/** Package-visible field that indicates a before-instantiation post-processor having kicked in */
-	@Nullable
+    /**
+     * 标识此bean的 {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} 是否已经执行完毕。
+     * Package-visible field that indicates a before-instantiation post-processor having kicked in
+     */
+    @Nullable
 	volatile Boolean beforeInstantiationResolved;
 
 	@Nullable

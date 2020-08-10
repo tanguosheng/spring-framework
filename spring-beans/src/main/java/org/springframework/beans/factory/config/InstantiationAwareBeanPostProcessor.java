@@ -63,7 +63,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * <p>The default implementation returns {@code null}.
 	 * @param beanClass the class of the bean to be instantiated
 	 * @param beanName the name of the bean
-	 * @return the bean object to expose instead of a default instance of the target bean,
+	 * @return 返回一个bean对象实例，用于代替默认的目标bean实例，如果返回null则继续默认的实例化。the bean object to expose instead of a default instance of the target bean,
 	 * or {@code null} to proceed with default instantiation
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see #postProcessAfterInstantiation

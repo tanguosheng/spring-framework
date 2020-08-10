@@ -253,12 +253,15 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        // 把beanName转成缓存所需的key
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
+            // 如果 已经增强的bean集合中 已经存在，则返回null.
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+            // 如果当前类是 基础(infrastructure)类 或者 可以跳过，则设置
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -375,6 +378,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			return proxy;
 		}
 
+		// 不存在增强器，则标识当前bean没有使用aop增强。
 		this.advisedBeans.put(cacheKey, Boolean.FALSE);
 		return bean;
 	}
