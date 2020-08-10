@@ -20,6 +20,8 @@ include "spring-webmvc"
 include "spring-webflux"
 include "spring-websocket"
 include "spring-framework-bom"
+// spring源码案例。可以用来debug
+include 'spring-example'
 
 // Exposes gradle buildSrc for IDE support
 include "buildSrc"
@@ -30,6 +32,5 @@ rootProject.children.each {project ->
 	project.buildFileName = "${project.name}.gradle"
 }
 
-// spring源码案例。可以用来debug
-include 'spring-example'
+
 
