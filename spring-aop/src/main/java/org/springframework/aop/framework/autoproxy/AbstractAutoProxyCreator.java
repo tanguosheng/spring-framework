@@ -146,6 +146,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<>(16);
 
+    /**
+     * 记录bean是否需要aop增强。key:beanName  value->是否需要增强，如果为true表示当前bean已经使用aop增强过了。
+     */
 	private final Map<Object, Boolean> advisedBeans = new ConcurrentHashMap<>(256);
 
 
@@ -257,11 +260,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
-            // 如果 已经增强的bean集合中 已经存在，则返回null.
+            // 如果 已经增强的bean集合中 已经存在，则返回null.(返回null表示：继续默认的bean实例化流程)
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-            // 如果当前类是 基础(infrastructure)类 或者 可以跳过，则设置
+            // 如果当前类是 基础(infrastructure)类 或者 可以跳过，则在缓存中记录当前bean无需aop增强。
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
