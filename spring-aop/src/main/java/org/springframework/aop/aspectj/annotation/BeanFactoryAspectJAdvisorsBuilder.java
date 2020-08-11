@@ -47,6 +47,9 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	@Nullable
 	private volatile List<String> aspectBeanNames;
 
+    /**
+     * 缓存：标注了@Aspect注解的切面类的beanName -> 此切面类中所有的增强方法（即：标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法）
+     */
 	private final Map<String, List<Advisor>> advisorsCache = new ConcurrentHashMap<>();
 
 	private final Map<String, MetadataAwareAspectInstanceFactory> aspectFactoryCache = new ConcurrentHashMap<>();
@@ -117,7 +120,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
                                 // 如果当前切面是单例的
                                 MetadataAwareAspectInstanceFactory factory = new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
-								// 解析标记AspectJ注解中的增强方法
+								// 解析标记@Aspect注解类中的增强方法。比如标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法。
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
