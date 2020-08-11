@@ -43,14 +43,23 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 	private final AspectJAdvisorFactory advisorFactory;
 
+    /**
+     * spring容器中所有的切面类的beanName
+     */
 	@Nullable
 	private volatile List<String> aspectBeanNames;
 
     /**
-     * 缓存：标注了@Aspect注解的切面类的beanName -> 此切面类中所有的增强方法（即：标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法）
+     *
+     * 缓存了所有单例切面bean的增强器：
+     * key:标注了@Aspect注解的切面类的beanName -> value:此切面类中所有的增强方法（即：标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法）
      */
 	private final Map<String, List<Advisor>> advisorsCache = new ConcurrentHashMap<>();
 
+    /**
+     * 缓存非单例切面bean的切面实例创建工厂
+     * key:标注了@Aspect注解的切面类的beanName -> value:此切面类的 MetadataAwareAspectInstanceFactory
+     */
 	private final Map<String, MetadataAwareAspectInstanceFactory> aspectFactoryCache = new ConcurrentHashMap<>();
 
 
