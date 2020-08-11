@@ -671,20 +671,18 @@ class CglibAopProxy implements AopProxy, Serializable {
 				// Get as late as possible to minimize the time we "own" the target, in case it comes from a pool...
 				target = targetSource.getTarget();
 				Class<?> targetClass = (target != null ? target.getClass() : null);
+                // 获取目标方法的拦截器链
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
-				Object retVal;
+				Object retVal; // 目标方法的返回值
 				// Check whether we only have one InvokerInterceptor: that is,
 				// no real advice, but just reflective invocation of the target.
-				if (chain.isEmpty() && Modifier.isPublic(method.getModifiers())) {
+                // 如果没有拦截器链 并且 当前方法是public方法，则直接使用反射调用此方法。
+                if (chain.isEmpty() && Modifier.isPublic(method.getModifiers())) {
 					// We can skip creating a MethodInvocation: just invoke the target directly.
-					// Note that the final invoker must be an InvokerInterceptor, so we know
-					// it does nothing but a reflective operation on the target, and no hot
-					// swapping or fancy proxying.
 					Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
-					retVal = methodProxy.invoke(target, argsToUse);
-				}
-				else {
-					// We need to create a method invocation...
+					retVal = methodProxy.invoke(target, argsToUse); // 使用反射直接调用目标方法。（跳过创建 MethodInvocation）
+				} else {
+					// 存在方法拦截器链：创建 MethodInvocation 并调用 proceed()
 					retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();
 				}
 				retVal = processReturnType(proxy, target, method, retVal);
@@ -742,10 +740,11 @@ class CglibAopProxy implements AopProxy, Serializable {
 		 */
 		@Override
 		protected Object invokeJoinpoint() throws Throwable {
+            // 如果目标方法是 public 方法，则直接使用java反射调用目标方法。
 			if (this.publicMethod) {
 				return this.methodProxy.invoke(this.target, this.arguments);
-			}
-			else {
+			} else {
+                // 如果不是 public 方法，则调用父类的方法。
 				return super.invokeJoinpoint();
 			}
 		}
@@ -834,6 +833,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				}
 				return INVOKE_HASHCODE;
 			}
+			// 被代理的目标类Class
 			Class<?> targetClass = this.advised.getTargetClass();
 			// Proxy is not yet available, but that shouldn't matter.
 			List<?> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);

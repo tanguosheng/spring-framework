@@ -16,26 +16,18 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.weaver.tools.JoinPointMatch;
 import org.aspectj.weaver.tools.PointcutParameter;
-
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.MethodMatcher;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.aop.framework.adapter.AfterReturningAdviceInterceptor;
+import org.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.aop.support.ComposablePointcut;
 import org.springframework.aop.support.MethodMatchers;
@@ -48,6 +40,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base class for AOP Alliance {@link org.aopalliance.aop.Advice} classes
@@ -93,11 +94,29 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 	private final Class<?> declaringClass;
 
+    /**
+     * 增强方法的方法名称。
+     * 表示：{@code this.aspectJAdviceMethod.getName()}
+     */
 	private final String methodName;
 
+    /**
+     * 目标方法的参数类型列表（可能有多个参数，所以这里是数组）
+     */
 	private final Class<?>[] parameterTypes;
 
-	protected transient Method aspectJAdviceMethod;
+    /**
+     * <pre>
+     * 对目标方法的增强方法。
+     * 对于不同的增强器，这里可能表示不同的增强方法。
+     * 例如：
+     * {@link MethodBeforeAdviceInterceptor} 这个用于处理 切面前置通知的拦截器，{@link this#aspectJAdviceMethod} 就表示 @Before("pointCut()") 注释的方法。
+     * {@link AspectJAfterAdvice} 这个用于处理 切面后置通知的拦截器，{@link this#aspectJAdviceMethod} 就表示 @After("pointCut()") 注释的方法。
+     * {@link AfterReturningAdviceInterceptor} 这个用于处理 目标方法return之后的拦截器，{@link this#aspectJAdviceMethod} 就表示 @AfterReturning(value="pointCut()",returning="result") 注释的方法。
+     * {@link AspectJAfterThrowingAdvice} 这个用于处理 目标方法发生异常的拦截器，{@link this#aspectJAdviceMethod} 就表示 @AfterThrowing(value="pointCut()",throwing="exception") 注释的方法。
+     * </pre>
+     */
+    protected transient Method aspectJAdviceMethod;
 
 	private final AspectJExpressionPointcut pointcut;
 

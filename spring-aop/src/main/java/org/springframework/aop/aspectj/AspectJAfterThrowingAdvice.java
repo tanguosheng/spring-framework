@@ -62,8 +62,9 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 			return mi.proceed();
 		}
 		catch (Throwable ex) {
-			if (shouldInvokeOnThrowing(ex)) {
-				invokeAdviceMethod(getJoinPointMatch(), null, ex);
+            // 目标方法执行抛出异常时，会进入此catch。判断aop是否存在 @AfterThrowing(value="pointCut()",throwing="exception")方法，如果存在则调用。
+            if (shouldInvokeOnThrowing(ex)) {
+                invokeAdviceMethod(getJoinPointMatch(), null, ex);
 			}
 			throw ex;
 		}

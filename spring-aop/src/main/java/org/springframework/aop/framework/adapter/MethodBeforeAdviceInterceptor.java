@@ -52,7 +52,9 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+        // 这里先调用 @Before("pointCut()") 指定的方法，
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
+        // @Before("pointCut()") 指定的方法执行完之后，再执行目标方法。
 		return mi.proceed();
 	}
 
