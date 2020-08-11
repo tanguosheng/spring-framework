@@ -128,7 +128,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		// so that it will only instantiate once.
 		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory = new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
-        // 此aop切面类中定义的所有用于增强的方法。比如标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法。
+        // 切面类aspectClass中定义的增强方法。比如标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法。
 		List<Advisor> advisors = new ArrayList<>();
 
 		// 获取切面类里的增强方法。其实是排除Pointcut注解的其他方法，所以下面还需具体要判断是否为切面方法。
