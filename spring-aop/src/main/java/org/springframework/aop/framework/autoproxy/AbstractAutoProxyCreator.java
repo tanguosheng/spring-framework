@@ -46,6 +46,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -256,6 +257,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        // 对于spring容器中所有bean的实例化之前，会调用后置处理器的此方法。
+        // 此类（自动代理创建器）会记录所有bean是否已经创建过代理对象、是否无需创建代理对象。也就是在 advisedBeans 中记录的。
+
+
         // 把beanName转成缓存所需的key
 		Object cacheKey = getCacheKey(beanClass, beanName);
 

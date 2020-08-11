@@ -69,6 +69,11 @@ import org.springframework.util.comparator.InstanceComparator;
 @SuppressWarnings("serial")
 public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFactory implements Serializable {
 
+    /**
+     * 切面类里的增强方法的排序规则：
+     * 1、先根据增强方法上的注解排序(Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class顺序)
+     * 2、再根据 方法名称排序
+     */
 	private static final Comparator<Method> METHOD_COMPARATOR;
 
 	static {
@@ -112,27 +117,32 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
-		// 获取标记为 AspectJ 的类
+		// 获取标记 @Aspect 注解的切面类Class
 		Class<?> aspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
-		// 获取标记为AspectJ的name
+		// 获取标记 @Aspect的 beanName
 		String aspectName = aspectInstanceFactory.getAspectMetadata().getAspectName();
-		// 验证
+		// 校验
 		validate(aspectClass);
 
 		// We need to wrap the MetadataAwareAspectInstanceFactory with a decorator
 		// so that it will only instantiate once.
-		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory =
-				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
+		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory = new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
+        // 此aop切面类中定义的所有用于增强的方法。比如标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法。
 		List<Advisor> advisors = new ArrayList<>();
-		for (Method method : getAdvisorMethods(aspectClass)) {
-			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, advisors.size(), aspectName);
+
+		// 获取切面类里的增强方法。其实是排除Pointcut注解的其他方法，所以下面还需具体要判断是否为切面方法。
+        List<Method> advisorMethods = getAdvisorMethods(aspectClass);
+        // 遍历所有的 候选增强方法，并找到真实的增强方法，保存到 advisors list 中。
+        for (Method candidateAdviceMethod : advisorMethods) {
+			Advisor advisor = getAdvisor(candidateAdviceMethod, lazySingletonAspectInstanceFactory, advisors.size(), aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
 			}
 		}
 
 		// If it's a per target aspect, emit the dummy instantiating aspect.
+        // 如果是一个懒加载的切面，就虚拟一个切面。
 		if (!advisors.isEmpty() && lazySingletonAspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
 			Advisor instantiationAdvisor = new SyntheticInstantiationAdvisor(lazySingletonAspectInstanceFactory);
 			advisors.add(0, instantiationAdvisor);
@@ -149,15 +159,23 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		return advisors;
 	}
 
+    /**
+     * 获取切面类里的增强方法。
+     *
+     * 遍历切面类里的所有方法，找到不带有 Pointcut 注解的所有方法。
+     * @param aspectClass 切面类Class
+     * @return
+     */
 	private List<Method> getAdvisorMethods(Class<?> aspectClass) {
 		final List<Method> methods = new ArrayList<>();
 		ReflectionUtils.doWithMethods(aspectClass, method -> {
-			// Exclude pointcuts
+			// 排除 pointcuts 方法。AnnotationUtils.getAnnotation(method, Pointcut.class) 为null说明，方法上没有 @Pointcut 注解
 			if (AnnotationUtils.getAnnotation(method, Pointcut.class) == null) {
 				methods.add(method);
 			}
 		});
-		methods.sort(METHOD_COMPARATOR);
+        // 为增强方法排序
+        methods.sort(METHOD_COMPARATOR);
 		return methods;
 	}
 
@@ -185,6 +203,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	}
 
 
+    // 参数 candidateAdviceMethod 表示 ：候选的增强方法。所以这里还需要对此方法进一步校验。
 	@Override
 	@Nullable
 	public Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,
@@ -192,8 +211,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
 
-		AspectJExpressionPointcut expressionPointcut = getPointcut(
-				candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
+		AspectJExpressionPointcut expressionPointcut = getPointcut(candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
 		if (expressionPointcut == null) {
 			return null;
 		}
@@ -204,15 +222,17 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	@Nullable
 	private AspectJExpressionPointcut getPointcut(Method candidateAdviceMethod, Class<?> candidateAspectClass) {
-		AspectJAnnotation<?> aspectJAnnotation =
-				AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
+        // 从 候选增强方法 上找aop的注解，如果没有aop的指定注解，就说明此 候选方法并不是aop的增强方法。
+		AspectJAnnotation<?> aspectJAnnotation = AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
 			return null;
 		}
 
-		AspectJExpressionPointcut ajexp =
-				new AspectJExpressionPointcut(candidateAspectClass, new String[0], new Class<?>[0]);
-		ajexp.setExpression(aspectJAnnotation.getPointcutExpression());
+        // @Before("pointCut()") @After("pointCut()") 等这些注解里的 "pointCut()" 表达式。
+        String pointcutExpression = aspectJAnnotation.getPointcutExpression();
+
+        AspectJExpressionPointcut ajexp = new AspectJExpressionPointcut(candidateAspectClass, new String[0], new Class<?>[0]);
+        ajexp.setExpression(pointcutExpression);
 		if (this.beanFactory != null) {
 			ajexp.setBeanFactory(this.beanFactory);
 		}
@@ -228,8 +248,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		Class<?> candidateAspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
 		validate(candidateAspectClass);
 
-		AspectJAnnotation<?> aspectJAnnotation =
-				AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
+		AspectJAnnotation<?> aspectJAnnotation = AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
 			return null;
 		}

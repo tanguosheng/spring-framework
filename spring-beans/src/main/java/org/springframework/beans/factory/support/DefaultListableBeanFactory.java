@@ -789,8 +789,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						}
 					}
 				} else {
-					// getBean 执行bean实例化逻辑
-					getBean(beanName);
+					// getBean 如果spring容器中没有此bean，就执行bean实例化并初始化逻辑。否则就从缓存中获取bean
+					getBean(beanName); // 这个beanName是启动spring以来，注册的 BeanDefinition 的名称。来自：beanDefinitionNames
 				}
 			}
 		}

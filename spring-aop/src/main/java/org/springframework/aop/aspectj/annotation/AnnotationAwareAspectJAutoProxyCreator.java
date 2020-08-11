@@ -49,6 +49,11 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {
 
+    /**
+     * 一个正则表达式集合。用于校验 切面(Aspect)是否合法。
+     * 默认：所有切面（标注@Aspect注解的bean）都是合法的
+     *
+     */
 	@Nullable
 	private List<Pattern> includePatterns;
 

@@ -92,12 +92,11 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 				if (aspectNames == null) {
 					List<Advisor> advisors = new ArrayList<>();
 					aspectNames = new ArrayList<>();
-					// 获取所有 beanName
-					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
-							this.beanFactory, Object.class, true, false);
+					// 获取所有 beanName。判断这些bean是否需要进行增强。
+					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(this.beanFactory, Object.class, true, false);
 					// 循环所有 beanName 找出对应的增强方法
 					for (String beanName : beanNames) {
-						// 不合格的 bean continue，子类覆盖此方法。本类中默认返回true,
+						// 不合格的切面(aspect) bean  就 continue，子类覆盖此方法。本类中默认返回true,
 						// 这里调用的是 BeanFactoryAspectJAdvisorsBuilderAdapter.java 的方法，用正则匹配合格的bean
 						if (!isEligibleBean(beanName)) {
 							continue;
@@ -107,17 +106,17 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						// 我们必须小心不要急切地实例化bean，因为在这种情况下，它们将被Spring容器缓存，但不会被编织。
 
 						// 获取 bean 的类型
-						Class<?> beanType = this.beanFactory.getType(beanName);
-						if (beanType == null) {
+						Class<?> beanClass = this.beanFactory.getType(beanName);
+						if (beanClass == null) {
 							continue;
 						}
-						// 如果存在 Aspect 注解
-						if (this.advisorFactory.isAspect(beanType)) {
+						// 判断当前bean是否是切面(Aspect)，如果是切面，就使用
+						if (this.advisorFactory.isAspect(beanClass)) {
 							aspectNames.add(beanName);
-							AspectMetadata amd = new AspectMetadata(beanType, beanName);
+							AspectMetadata amd = new AspectMetadata(beanClass, beanName);
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
-								MetadataAwareAspectInstanceFactory factory =
-										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+                                // 如果当前切面是单例的
+                                MetadataAwareAspectInstanceFactory factory = new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
 								// 解析标记AspectJ注解中的增强方法
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
 								if (this.beanFactory.isSingleton(beanName)) {
@@ -127,13 +126,12 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 								}
 								advisors.addAll(classAdvisors);
 							} else {
+							    // 对于不是单例模式的bean：
 								// Per target or per this.
 								if (this.beanFactory.isSingleton(beanName)) {
-									throw new IllegalArgumentException("Bean with name '" + beanName +
-											"' is a singleton, but aspect instantiation model is not singleton");
+									throw new IllegalArgumentException("Bean with name '" + beanName + "' is a singleton, but aspect instantiation model is not singleton");
 								}
-								MetadataAwareAspectInstanceFactory factory =
-										new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
+								MetadataAwareAspectInstanceFactory factory = new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
 								this.aspectFactoryCache.put(beanName, factory);
 								advisors.addAll(this.advisorFactory.getAdvisors(factory));
 							}
