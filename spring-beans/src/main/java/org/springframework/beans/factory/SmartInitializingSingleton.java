@@ -44,6 +44,15 @@ package org.springframework.beans.factory;
 public interface SmartInitializingSingleton {
 
 	/**
+     *
+     * SmartInitializingSingleton 原理：->afterSingletonsInstantiated();
+     * 		1）、ioc容器创建对象并refresh()；
+     * 		2）、finishBeanFactoryInitialization(beanFactory);初始化剩下的单实例bean；
+     * 			1）、先创建所有的单实例bean；getBean();
+     * 			2）、获取所有创建好的单实例bean，判断是否是SmartInitializingSingleton类型的；
+     * 				如果是就调用afterSingletonsInstantiated();
+     *
+     *
 	 * Invoked right at the end of the singleton pre-instantiation phase,
 	 * with a guarantee that all regular singleton beans have been created
 	 * already. {@link ListableBeanFactory#getBeansOfType} calls within
