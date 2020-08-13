@@ -136,6 +136,7 @@ class InstantiationModelAwarePointcutAdvisorImpl
 
 	/**
 	 * Lazily instantiate advice if necessary.
+     * 懒惰实例化增强器.
 	 */
 	@Override
 	public synchronized Advice getAdvice() {
@@ -145,6 +146,11 @@ class InstantiationModelAwarePointcutAdvisorImpl
 		return this.instantiatedAdvice;
 	}
 
+    /**
+     * 使用aspectJ增强器工厂 创建增强器实例对象
+     * @param pointcut
+     * @return
+     */
 	private Advice instantiateAdvice(AspectJExpressionPointcut pointcut) {
 		Advice advice = this.aspectJAdvisorFactory.getAdvice(this.aspectJAdviceMethod, pointcut,
 				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);

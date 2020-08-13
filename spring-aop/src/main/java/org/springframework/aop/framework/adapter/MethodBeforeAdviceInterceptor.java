@@ -37,8 +37,10 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeAdvice, Serializable {
 
+    /**
+     * 前置通知的方法增强器
+     */
 	private final MethodBeforeAdvice advice;
-
 
 	/**
 	 * Create a new MethodBeforeAdviceInterceptor for the given advice.
@@ -52,6 +54,10 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+        // 当前 MethodBeforeAdviceInterceptor 这个 方法拦截器(MethodInterceptor),用来处理 @Before 注解.
+        // 实现:先去调用前置通知,然后再调用目标方法;
+        //      在advice.before() 方法中会去调用aop切面中声明的 @Before 方法.
+
         // 这里先调用 @Before("pointCut()") 指定的方法，
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
         // @Before("pointCut()") 指定的方法执行完之后，再执行目标方法。

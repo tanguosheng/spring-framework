@@ -58,6 +58,8 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+        // 当前 AspectJAfterThrowingAdvice 这个 方法拦截器(MethodInterceptor),用来处理 @AfterThrowing 注解.
+        // 使用try-catch 包装目标方法的调用.当目标方法的调用出现异常时,就进入catch逻辑:去调用aop切面中声明的 @AfterThrowing 方法.
 		try {
 			return mi.proceed();
 		}

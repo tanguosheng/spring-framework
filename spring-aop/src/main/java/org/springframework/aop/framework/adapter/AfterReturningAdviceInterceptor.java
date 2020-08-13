@@ -52,6 +52,8 @@ public class AfterReturningAdviceInterceptor implements MethodInterceptor, After
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+        // 当前 AfterReturningAdviceInterceptor 这个 方法拦截器(MethodInterceptor),用来处理 @AfterReturning 注解.
+        // 实现:先去调用目标方法mi.proceed() ,当正确返回时,调用 advice.afterReturning() 方法,从而调用aop切面中声明的 @AfterReturning 方法.
 		Object retVal = mi.proceed();
 		// 目标方法没有异常，正常return时，会使用反射调用 @AfterReturning(value="pointCut()",returning="result") 指定的方法。
 		this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());

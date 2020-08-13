@@ -102,6 +102,9 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
     /**
      * 目标方法的参数类型列表（可能有多个参数，所以这里是数组）
+     * 可以通过 parameterTypes.length 得知增强方法有多少个参数.
+     *
+     * @see AbstractAspectJAdvice#argBinding(JoinPoint, JoinPointMatch, Object, Throwable)
      */
 	private final Class<?>[] parameterTypes;
 
@@ -118,6 +121,10 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
      */
     protected transient Method aspectJAdviceMethod;
 
+    /**
+     * 相关通知的切面配置
+     * 比如: @After#value() 对应的值.
+     */
 	private final AspectJExpressionPointcut pointcut;
 
 	private final AspectInstanceFactory aspectInstanceFactory;
@@ -141,11 +148,17 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	@Nullable
 	private String[] argumentNames;
 
-	/** Non-null if after throwing advice binds the thrown value */
-	@Nullable
+    /**
+     * Non-null if after throwing advice binds the thrown value
+     * 注解@AfterThrowing(value="pointCut()",throwing="exception")的 throwing 属性的值
+     */
+    @Nullable
 	private String throwingName;
 
-	/** Non-null if after returning advice binds the return value */
+    /**
+     * Non-null if after returning advice binds the return value
+     * 注解@AfterReturning(value="pointCut()",returning="result")的 returning 属性的值.
+     */
 	@Nullable
 	private String returningName;
 
@@ -154,10 +167,21 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	private Class<?> discoveredThrowingType = Object.class;
 
 	/**
-	 * Index for thisJoinPoint argument (currently only
-	 * supported at index 0 if present at all)
-	 */
-	private int joinPointArgumentIndex = -1;
+     * <pre>
+     *
+     * JoinPoint 参数所在增强方法参数列表的下标.如果为默认值-1,就表示 joinPoint 在参数列表的第一位.
+     * {@code
+     *        @Before("pointCut()")
+     *        public void before(JoinPoint joinPoint){
+     *     		Object[] args = joinPoint.getArgs();
+     *     		System.out.println(""+joinPoint.getSignature().getName()+"运行。。。@Before:参数列表是：{"+Arrays.asList(args)+"}");
+     *        }
+     * }
+     *
+     * Index for thisJoinPoint argument (currently only supported at index 0 if present at all)
+     * </pre>
+     */
+    private int joinPointArgumentIndex = -1;
 
 	/**
 	 * Index for thisJoinPointStaticPart argument (currently only
@@ -569,29 +593,45 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
+     * <pre>
+     *
+     * 构建出增强方法参数值.
+     * 如下增强方法:
+     *        {@code
+     *           @AfterThrowing(value="pointCut()",throwing="exception")
+     *           public void logException(JoinPoint joinPoint,Exception exception){
+     *        		System.out.println(""+joinPoint.getSignature().getName()+"异常。。。异常信息：{"+exception+"}");
+     *           }
+     *        }
+     * 有两个参数 分别是:JoinPoint joinPoint,Exception exception .
+     * {@link AbstractAspectJAdvice#argBinding} 方法就是为了构建出 logException(JoinPoint joinPoint,Exception exception) 方法的参数列表.
+     * </pre>
+     *
 	 * Take the arguments at the method execution join point and output a set of arguments
 	 * to the advice method
-	 * @param jp the current JoinPoint
+	 * @param joinPoint the current JoinPoint
 	 * @param jpMatch the join point match that matched this execution join point
 	 * @param returnValue the return value from the method execution (may be null)
 	 * @param ex the exception thrown by the method execution (may be null)
 	 * @return the empty array if there are no arguments
 	 */
-	protected Object[] argBinding(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
+	protected Object[] argBinding(JoinPoint joinPoint, @Nullable JoinPointMatch jpMatch,
 			@Nullable Object returnValue, @Nullable Throwable ex) {
 
 		calculateArgumentBindings();
 
 		// AMC start
-		Object[] adviceInvocationArgs = new Object[this.parameterTypes.length];
+        int parameterCount = this.parameterTypes.length; // 增强方法参数个数
+        Object[] adviceInvocationArgs = new Object[parameterCount];
 		int numBound = 0;
 
+        // JoinPoint 参数所在增强方法参数列表的下标.如果为默认值-1,就表示 joinPoint 在参数列表的第一位.
 		if (this.joinPointArgumentIndex != -1) {
-			adviceInvocationArgs[this.joinPointArgumentIndex] = jp;
+			adviceInvocationArgs[this.joinPointArgumentIndex] = joinPoint;
 			numBound++;
 		}
 		else if (this.joinPointStaticPartArgumentIndex != -1) {
-			adviceInvocationArgs[this.joinPointStaticPartArgumentIndex] = jp.getStaticPart();
+			adviceInvocationArgs[this.joinPointStaticPartArgumentIndex] = joinPoint.getStaticPart();
 			numBound++;
 		}
 
@@ -620,8 +660,9 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 			}
 		}
 
-		if (numBound != this.parameterTypes.length) {
-			throw new IllegalStateException("Required to bind " + this.parameterTypes.length +
+		// 如果实际构建出参数个数和期望参数个数不同:则报错.
+		if (numBound != parameterCount) {
+			throw new IllegalStateException("Required to bind " + parameterCount +
 					" arguments, but only bound " + numBound + " (JoinPointMatch " +
 					(jpMatch == null ? "was NOT" : "WAS") + " bound in invocation)");
 		}
@@ -638,18 +679,17 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 * @return the invocation result
 	 * @throws Throwable in case of invocation failure
 	 */
-	protected Object invokeAdviceMethod(
-			@Nullable JoinPointMatch jpMatch, @Nullable Object returnValue, @Nullable Throwable ex)
-			throws Throwable {
+	protected Object invokeAdviceMethod(@Nullable JoinPointMatch jpMatch, @Nullable Object returnValue, @Nullable Throwable ex) throws Throwable {
 
-		return invokeAdviceMethodWithGivenArgs(argBinding(getJoinPoint(), jpMatch, returnValue, ex));
+        Object[] methodArgs = argBinding(getJoinPoint(), jpMatch, returnValue, ex);
+        return invokeAdviceMethodWithGivenArgs(methodArgs);
 	}
 
 	// As above, but in this case we are given the join point.
-	protected Object invokeAdviceMethod(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
-			@Nullable Object returnValue, @Nullable Throwable t) throws Throwable {
+	protected Object invokeAdviceMethod(JoinPoint jp, @Nullable JoinPointMatch jpMatch, @Nullable Object returnValue, @Nullable Throwable t) throws Throwable {
 
-		return invokeAdviceMethodWithGivenArgs(argBinding(jp, jpMatch, returnValue, t));
+        Object[] methodArgs = argBinding(jp, jpMatch, returnValue, t);
+        return invokeAdviceMethodWithGivenArgs(methodArgs);
 	}
 
 	protected Object invokeAdviceMethodWithGivenArgs(Object[] args) throws Throwable {

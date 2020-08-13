@@ -202,6 +202,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	}
 
 
+	// 获取 候选的增强方法 的增强器.Advisor
     // 参数 candidateAdviceMethod 表示 ：候选的增强方法。所以这里还需要对此方法进一步校验。
 	@Override
 	@Nullable
