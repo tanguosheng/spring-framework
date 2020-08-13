@@ -76,8 +76,12 @@ public class EventListenerMethodProcessor implements SmartInitializingSingleton,
 	}
 
 
+	// 此方法说明:(英文说明见接口)
+    // 使用 事件监听器创建工厂,把标注 @EventListener注解的方法,创建成 ApplicationListener.
+    // 然后使用 context.addApplicationListener(applicationListener); 把 创建的 ApplicationListener 注册到spring应用程序上线文中.
 	@Override
 	public void afterSingletonsInstantiated() {
+	    // 事件监听器创建工厂:可以把标注 @EventListener注解的方法,创建成 ApplicationListener.
 		List<EventListenerFactory> factories = getEventListenerFactories();
 		ConfigurableApplicationContext context = getApplicationContext();
 		String[] beanNames = context.getBeanNamesForType(Object.class);
