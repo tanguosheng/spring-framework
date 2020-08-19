@@ -127,6 +127,8 @@ public class AnnotationConfigUtils {
 
 
 	/**
+     * 注册所有的相关的注解后置处理器
+     *
 	 * Register all relevant annotation post processors in the given registry.
 	 * @param registry the registry to operate on
 	 */
@@ -186,8 +188,7 @@ public class AnnotationConfigUtils {
 		if (jpaPresent && !registry.containsBeanDefinition(PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition();
 			try {
-				def.setBeanClass(ClassUtils.forName(PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME,
-						AnnotationConfigUtils.class.getClassLoader()));
+				def.setBeanClass(ClassUtils.forName(PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME, AnnotationConfigUtils.class.getClassLoader()));
 			}
 			catch (ClassNotFoundException ex) {
 				throw new IllegalStateException(

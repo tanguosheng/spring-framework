@@ -48,6 +48,15 @@ import org.springframework.lang.Nullable;
  */
 final class PostProcessorRegistrationDelegate {
 
+    /**
+     * <pre>
+     * 调用 BeanFactory 后置处理器:
+     * 1、先调用所有的 {@link BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry}
+     * 2、
+     * </pre>
+     * @param beanFactory
+     * @param beanFactoryPostProcessors
+     */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -74,8 +83,7 @@ final class PostProcessorRegistrationDelegate {
 				 * 再把它放进 registryProcessors 集合
 				 */
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
-					BeanDefinitionRegistryPostProcessor registryProcessor =
-							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					BeanDefinitionRegistryPostProcessor registryProcessor = (BeanDefinitionRegistryPostProcessor) postProcessor;
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
 					// 放入 registryProcessor 集合
 					registryProcessors.add(registryProcessor);
@@ -98,8 +106,7 @@ final class PostProcessorRegistrationDelegate {
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
 			// 首先，调用实现 PriorityOrdered 的 BeanDefinitionRegistryPostProcessors。
-			String[] postProcessorNames =
-					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
+			String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));

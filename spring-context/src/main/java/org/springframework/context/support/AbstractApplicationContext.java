@@ -569,7 +569,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 2. 初始化BeanFactory，并进行XML文件读取。在这里验证解析xml文件、注册bean到容器中
+			// 2. 获取一个新的bean工厂(如果已经存在则refresh):然后使用新的bean工厂,解析所有的bean定义:loadBeanDefinitions()
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -974,10 +974,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 初始化上下文的转换服务。
 		// CONVERSION_SERVICE_BEAN_NAME = "conversionService"
 		// 详解参见：https://blog.csdn.net/zhuqiuhui/article/details/82316720  感谢作者~
-		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
-				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
-			beanFactory.setConversionService(
-					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
+		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) && beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
+			beanFactory.setConversionService(beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
 		// Register a default embedded value resolver if no bean post-processor

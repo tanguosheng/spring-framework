@@ -134,7 +134,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			beanFactory.setSerializationId(getId());
 			// 在customizeBeanFactory方法中设置两个布尔参数allowBeanDefinitionOverriding、allowCircularReferences
 			customizeBeanFactory(beanFactory);
-			// 正式开始解析xml
+			// 正式开始解析所有的bean定义.
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
 				// BeanFactory作为成员变量被AbstractRefreshableApplicationContext类持有。

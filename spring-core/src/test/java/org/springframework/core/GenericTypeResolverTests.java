@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
@@ -176,8 +177,19 @@ public class GenericTypeResolverTests {
 	}
 
 
+    @Test
+    public void testMyIntetgerInterfaceType() {
+        // GenericTypeResolver.resolveTypeArgument() 方法用来解析子类上的泛型.
+        Class<?> resolved = GenericTypeResolver.resolveTypeArgument(MyIntetgerInterfaceType.class, MyInterfaceType.class);
+        System.out.println(resolved.getName());
+        Assert.assertEquals("获取到MyIntetgerInterfaceType类的泛型不为Integer", Integer.class,resolved);
+    }
+
 	public interface MyInterfaceType<T> {
 	}
+
+	public class MyIntetgerInterfaceType implements MyInterfaceType<Integer>{
+    }
 
 	public class MySimpleInterfaceType implements MyInterfaceType<String> {
 	}
