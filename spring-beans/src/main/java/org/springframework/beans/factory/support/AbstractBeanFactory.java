@@ -314,7 +314,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
 			if (isPrototypeCurrentlyInCreation(beanName)) {
-				// 如果原型（prototype）bean在当前线程正在创建中，抛出异常。
+				// 如果原型（prototype）bean在当前线程正在创建中（说明prototype类型的bean有循环依赖），抛出异常。
+				// 比如: A(创建前先放入 prototypesCurrentlyInCreation )
+				// 		-> B(创建前先放入 prototypesCurrentlyInCreation )
+				// 		-> A(这里判断在prototypesCurrentlyInCreation中有，就是循环依赖)
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
@@ -344,7 +347,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
-				// 删除名为 beanName 的 mergedBeanDefinition缓存
+				// 删除名为 beanName 的 mergedBeanDefinition 缓存
 				// 让bean定义重新合并，以防万一其中一些元数据在此期间发生变化。
 				// 添加 alreadyCreated 标记
 				markBeanAsCreated(beanName);
@@ -381,7 +384,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (mbd.isSingleton()) {
 					// Singleton 的情况
 
-					// 创建一个 ObjectFactory 隐藏实际创建bean的细节
+					// 创建一个 ObjectFactory 隐藏实际创建 bean 的细节
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);
@@ -395,7 +398,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
-					// 获取给定bean实例的对象，bean实例本身或其创建的对象（如果是 FactoryBean）。
+					// 获取给定 bean 实例的对象，bean 实例本身或其创建的对象（如果是 FactoryBean）。
+					// 这里正常会调用到 AbstractAutowireCapableBeanFactory 类的 getObjectForBeanInstance()
+					// 里边调用super.getObjectForBeanInstance 最终调用到 AbstractBeanFactory(本类)的 getObjectForBeanInstance()
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				} else if (mbd.isPrototype()) {
 					// Prototype 的情况
@@ -1711,7 +1716,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		/*
 		 * 有以下几种情况：
 		 * Ⅰ:	beanName = "a"    A instanceof FactoryBean = true	  return A FactoryBean创建的实例
-		 * Ⅱ:	beanName = "a"	  A instanceof FactoryBean = false	  return A的单例实例
+		 * Ⅱ:	beanName = "a"	  A instanceof FactoryBean = false	  return A 的单例实例
 		 * Ⅲ:	beanName = "&a"	  A instanceof FactoryBean = true	  return A FactoryBean
 		 * Ⅳ:	beanName = "&a"	  A instanceof FactoryBean = false	  return 报错
 		 */
@@ -1732,14 +1737,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
 		// If it's a FactoryBean, we use it to create a bean instance, unless the
 		// caller actually wants a reference to the factory.
-		// 现在我们有了bean实例，它可能是 普通bean 或 FactoryBean。
-		// 如果它是FactoryBean，我们使用它来创建bean实例，除非调用者实际上想要引用工厂。
+		// 现在我们有了bean实例，它可能是 普通 bean 或 FactoryBean。
+		// 如果它是 FactoryBean，我们使用它来创建bean实例，除非调用者实际上想要引用工厂。
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
-			// 情况Ⅱ、情况Ⅲ
+			// 情况Ⅱ		beanName = "a"	A instanceof FactoryBean = false	return A 的单例实例
+			// 情况Ⅲ	beanName = "&a"	A instanceof FactoryBean = true		return A FactoryBean
 			return beanInstance;
 		}
 
-		// 情况Ⅰ: 通过FactoryBean创建实例
+		// 情况Ⅰ: beanName = "a"    A instanceof FactoryBean = true	  return A FactoryBean创建的实例
+		// 通过FactoryBean创建实例
 		Object object = null;
 		if (mbd == null) { // true
 			// 从 FactoryBeans创建的单例对象缓存 中取得Bean实例

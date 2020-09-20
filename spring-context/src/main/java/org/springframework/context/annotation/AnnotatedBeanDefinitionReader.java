@@ -85,7 +85,7 @@ public class AnnotatedBeanDefinitionReader {
 		this.registry = registry;
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
 
-        // 注册 注解配置处理器.用于处理所有的注解配置.比如 @Import @Bean @Configuration
+        // 注册 注解配置处理器. .比如 @Import @Bean @Configuration
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 

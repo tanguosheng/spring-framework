@@ -201,33 +201,32 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		// 先尝试从一级缓存中获取
+		// 如果拿到了，说明拿到的Bean不是当前创建链中的bean，直接返回就行了
 		Object singletonObject = this.singletonObjects.get(beanName);
 		// 如果没有拿到，并且这个bean还正在创建中...
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
-			// DefaultSingletonBeanRegistry类 singletonObjects 属性持有所有已经实例化的singleton集合（ConcurrentHashMap）
+			// DefaultSingletonBeanRegistry 类的 singletonObjects 属性持有所有已经实例化的singleton集合（ConcurrentHashMap）
 			synchronized (this.singletonObjects) {
-				/*
-				 * 在创建bean过程中，有自动注入的情况：
-				 * 比如 A->B->C->A...，
-				 * A类包含一个B类的属性，可是容器中B类还没有被实例化，
-				 * 实例化A后（通过构建好的 ObjectFactory），将A实例放入 earlySingletonObjects，
-				 * 去实例化B，将B实例放入 earlySingletonObjects，再去实例化C，
-				 * 实例化C后发现C类包含有A类属性，那就直接从 earlySingletonObjects取得A就好了，
-				 * 这样拿到的A实例就能保证是同一个。
-				 * 解决了循环依赖问题。
-				 *
-				 * ObjectFactory 隐藏了bean的创建细节，在工厂中可能存在对bean的增强（AOP），
-				 * 如果需要AOP则返回AOP后的代理实例，如果无AOP直接返回bean本身实例
-				 */
+				// 尝试从二级缓存中获取
 				singletonObject = this.earlySingletonObjects.get(beanName);
+
+				// allowEarlyReference 这个变量很奇妙，需要注意传进来的是什么值，策略不同
+				// 如果二级缓存中没拿到，并且此次getSingleton允许获取提前曝光的Reference
 				if (singletonObject == null && allowEarlyReference) {
-					// 创建实例时会把实际创建过程隐藏在 ObjectFactory 中（程序主线不必关心具体bean创建过程）
+
+					// 从三级缓存中获取创建bean的 ObjectFactory, 这个 ObjectFactory 是带有创建代理能力的
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
-						// 创建实例
+
+						// 创建实例，其实 bean的直接实例在第一次 getBean 时候已经实例化好了，
+						// 这里调用getObject是把代理应用到实例上，返回一个包裹好的bean，可能是代理对象，也可能是bean实例自己本身
 						singletonObject = singletonFactory.getObject();
-						// 记录在缓存中，earlySingletonObjects 和 singletonFactories 互斥
+
+						// 加入二级缓存, 二级缓存中的bean已经是被代理包裹的bean了
 						this.earlySingletonObjects.put(beanName, singletonObject);
+
+						// 删除三级缓存
 						this.singletonFactories.remove(beanName);
 					}
 				}
@@ -248,10 +247,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
-			// 尝试在单例对象的缓存中获取
+			// 尝试在单例对象的缓存中获取，
+			// 如果直接拿到了就是已经创建好的不需要再创建直接返回
+			// 如果拿不到就创建
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
-				// singletonsCurrentlyInDestruction = false; 优雅关闭Context删除缓存的单例时会修改为true
+				// singletonsCurrentlyInDestruction = false; 优雅关闭 Context 删除缓存的单例时会修改为true
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
@@ -260,7 +261,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				// 添加当前bean正在创建中状态
+				// 添加当前bean正在创建中状态 singletonsCurrentlyInCreation.add(beanName)
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -268,7 +269,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
-					// 调用工厂，返回新实例
+					// 调用隐藏创建细节的匿名工厂，返回新实例
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				} catch (IllegalStateException ex) {
@@ -289,11 +290,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
-					// 删除正在创建状态
+					// 删除正在创建状态 singletonsCurrentlyInCreation.remove(beanName)
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					// 添加单例bean的缓存
+					// 到这里已经是创建完整的实例了，添加到一级缓存，移除其他级缓存
+
+					// 添加一级缓存: 					this.singletonObjects.put(beanName, singletonObject);
+					// 移除三级缓存: 					this.singletonFactories.remove(beanName);
+					// 移除二级缓存: 					this.earlySingletonObjects.remove(beanName);
+					// 记录已经注册到容器中bean的名字: 	this.registeredSingletons.add(beanName);
 					addSingleton(beanName, singletonObject);
 				}
 			}

@@ -54,6 +54,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 	private final AnnotatedBeanDefinitionReader reader;
 
+	/**
+	 * 类路径下的bean定义扫描器
+	 */
 	private final ClassPathBeanDefinitionScanner scanner;
 
 
@@ -62,6 +65,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 调用此构造方法首先会先初始化父类构造方法，父类构造方法初始化了 DefaultListableBeanFactory
+
         // 初始化注解配置解析器:用于解析注解配置.比如 @Import @Bean
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		// 包扫描
