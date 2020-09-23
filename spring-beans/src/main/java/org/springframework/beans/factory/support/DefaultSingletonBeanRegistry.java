@@ -246,10 +246,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
+
+		// 这个 synchronized 防止getBean并发重复创建相同bean
 		synchronized (this.singletonObjects) {
 			// 尝试在单例对象的缓存中获取，
-			// 如果直接拿到了就是已经创建好的不需要再创建直接返回
-			// 如果拿不到就创建
+			// 如果直接拿到了就是已经创建好的不需要再创建直接返回，如果拿不到就创建
+			// 拿到了可能是因为并发调用getBean(A)时发生的。
+			// 在 AbstractBeanFactory#doGetBean()时，第一次调用拿不到bean，到这里准备创建Bean，
+			// 但是已经被其他线程创建好放在一级缓存了，这里取来直接用就行了
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
 				// singletonsCurrentlyInDestruction = false; 优雅关闭 Context 删除缓存的单例时会修改为true

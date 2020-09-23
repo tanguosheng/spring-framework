@@ -648,6 +648,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Switch to active.
 		this.startupDate = System.currentTimeMillis();
 		this.closed.set(false);
+
+		// 激活才能getBean
 		this.active.set(true);
 
 		if (logger.isInfoEnabled()) {
@@ -683,6 +685,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.
+		// 子类扩展用方法
+		// 在此处用 ConfigurablePropertyResolver＃setRequiredProperties 设置容器启动必要的参数
+		// 在 prepareRefresh()中会调用 getEnvironment().validateRequiredProperties() 验证此处设置的参数，如果没有就会报错
 	}
 
 	/**
@@ -765,6 +770,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 * 作为ApplicationListeners注册到容器的事件多播器（ApplicationEventMulticaster）中，
 		 * 在bean销毁前（执行BeanPostProcessor的postProcessBeforeDestruction方法阶段）
 		 * 把bean从应用上下文的事件多播器上移除。
+		 *
+		 * 这里可以拿到正常加载的监听器，但是懒加载的拿不到
 		 */
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
@@ -950,6 +957,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let post-processors apply to them!
 		// 不要在这初始化bean：我们需要保留所有未经初始化的常规bean，让后处理器应用于它们！
+		// 基于ApplicationListener接口方式的监听器这里会拿到，注解方式的这里拿不到
+		// 这里还有一个重要的作用，防止懒加载的监听器漏网...
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
@@ -957,10 +966,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Publish early application events now that we finally have a multicaster...
 		// 现在我们终于有了一个多播器，发布早期的应用程序事件......
+		// 也就是说，在执行到这里前的事件都是早期事件，在这里被播发出去
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
+		// 清空早期事件
 		this.earlyApplicationEvents = null;
 		if (earlyEventsToProcess != null) {
 			for (ApplicationEvent earlyEvent : earlyEventsToProcess) {
+				// 播发早期事件
 				getApplicationEventMulticaster().multicastEvent(earlyEvent);
 			}
 		}

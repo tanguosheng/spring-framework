@@ -82,6 +82,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * @see org.springframework.core.task.SimpleAsyncTaskExecutor
 	 */
 	public void setTaskExecutor(@Nullable Executor taskExecutor) {
+		// 默认是同步 org.springframework.core.task.SyncTaskExecutor 播发
 		this.taskExecutor = taskExecutor;
 	}
 

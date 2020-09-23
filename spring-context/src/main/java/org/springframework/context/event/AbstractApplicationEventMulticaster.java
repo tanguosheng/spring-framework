@@ -380,6 +380,8 @@ public abstract class AbstractApplicationEventMulticaster
 					this.applicationListeners.size() + this.applicationListenerBeans.size());
 			allListeners.addAll(this.applicationListeners);
 			if (!this.applicationListenerBeans.isEmpty()) {
+
+				//
 				BeanFactory beanFactory = getBeanFactory();
 				for (String listenerBeanName : this.applicationListenerBeans) {
 					try {
