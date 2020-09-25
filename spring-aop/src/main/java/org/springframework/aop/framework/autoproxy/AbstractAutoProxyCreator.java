@@ -53,34 +53,26 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
- * that wraps each eligible bean with an AOP proxy, delegating to specified interceptors
- * before invoking the bean itself.
+ * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation that wraps each eligible bean with an AOP proxy, delegating to specified interceptors before invoking the bean
+ * itself.
  *
  * <p>This class distinguishes between "common" interceptors: shared for all proxies it
- * creates, and "specific" interceptors: unique per bean instance. There need not be any
- * common interceptors. If there are, they are set using the interceptorNames property.
- * As with {@link org.springframework.aop.framework.ProxyFactoryBean}, interceptors names
- * in the current factory are used rather than bean references to allow correct handling
- * of prototype advisors and interceptors: for example, to support stateful mixins.
- * Any advice type is supported for {@link #setInterceptorNames "interceptorNames"} entries.
+ * creates, and "specific" interceptors: unique per bean instance. There need not be any common interceptors. If there are, they are set using the interceptorNames property. As with {@link
+ * org.springframework.aop.framework.ProxyFactoryBean}, interceptors names in the current factory are used rather than bean references to allow correct handling of prototype advisors and interceptors:
+ * for example, to support stateful mixins. Any advice type is supported for {@link #setInterceptorNames "interceptorNames"} entries.
  *
  * <p>Such auto-proxying is particularly useful if there's a large number of beans that
- * need to be wrapped with similar proxies, i.e. delegating to the same interceptors.
- * Instead of x repetitive proxy definitions for x target beans, you can register
- * one single such post processor with the bean factory to achieve the same effect.
+ * need to be wrapped with similar proxies, i.e. delegating to the same interceptors. Instead of x repetitive proxy definitions for x target beans, you can register one single such post processor with
+ * the bean factory to achieve the same effect.
  *
  * <p>Subclasses can apply any strategy to decide if a bean is to be proxied, e.g. by type,
- * by name, by definition details, etc. They can also return additional interceptors that
- * should just be applied to the specific bean instance. A simple concrete implementation is
- * {@link BeanNameAutoProxyCreator}, identifying the beans to be proxied via given names.
+ * by name, by definition details, etc. They can also return additional interceptors that should just be applied to the specific bean instance. A simple concrete implementation is {@link
+ * BeanNameAutoProxyCreator}, identifying the beans to be proxied via given names.
  *
  * <p>Any number of {@link TargetSourceCreator} implementations can be used to create
- * a custom target source: for example, to pool prototype objects. Auto-proxying will
- * occur even if there is no advice, as long as a TargetSourceCreator specifies a custom
- * {@link org.springframework.aop.TargetSource}. If there are no TargetSourceCreators set,
- * or if none matches, a {@link org.springframework.aop.target.SingletonTargetSource}
- * will be used by default to wrap the target bean instance.
+ * a custom target source: for example, to pool prototype objects. Auto-proxying will occur even if there is no advice, as long as a TargetSourceCreator specifies a custom {@link
+ * org.springframework.aop.TargetSource}. If there are no TargetSourceCreators set, or if none matches, a {@link org.springframework.aop.target.SingletonTargetSource} will be used by default to wrap
+ * the target bean instance.
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
@@ -104,8 +96,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	protected static final Object[] DO_NOT_PROXY = null;
 
 	/**
-	 * Convenience constant for subclasses: Return value for
-	 * "proxy without additional interceptors, just the common ones".
+	 * Convenience constant for subclasses: Return value for "proxy without additional interceptors, just the common ones".
 	 *
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
@@ -123,8 +114,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
 	/**
-	 * Indicates whether or not the proxy should be frozen. Overridden from super
-	 * to prevent the configuration from becoming frozen too early.
+	 * Indicates whether or not the proxy should be frozen. Overridden from super to prevent the configuration from becoming frozen too early.
 	 */
 	private boolean freezeProxy = false;
 
@@ -147,15 +137,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<>(16);
 
-    /**
-     * 记录bean是否需要aop增强。key:beanName  value->是否需要增强，如果为true表示当前bean已经使用aop增强过了。
-     */
+	/**
+	 * 记录bean是否需要aop增强。key:beanName  value->是否需要增强，如果为true表示当前bean已经使用aop增强过了。
+	 */
 	private final Map<Object, Boolean> advisedBeans = new ConcurrentHashMap<>(256);
 
 
 	/**
-	 * Set whether or not the proxy should be frozen, preventing advice
-	 * from being added to it once it is created.
+	 * Set whether or not the proxy should be frozen, preventing advice from being added to it once it is created.
 	 * <p>Overridden from the super class to prevent the proxy configuration
 	 * from being frozen before the proxy is created.
 	 */
@@ -180,38 +169,30 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Set custom {@code TargetSourceCreators} to be applied in this order.
-	 * If the list is empty, or they all return null, a {@link SingletonTargetSource}
-	 * will be created for each bean.
+	 * Set custom {@code TargetSourceCreators} to be applied in this order. If the list is empty, or they all return null, a {@link SingletonTargetSource} will be created for each bean.
 	 * <p>Note that TargetSourceCreators will kick in even for target beans
-	 * where no advices or advisors have been found. If a {@code TargetSourceCreator}
-	 * returns a {@link TargetSource} for a specific bean, that bean will be proxied
-	 * in any case.
+	 * where no advices or advisors have been found. If a {@code TargetSourceCreator} returns a {@link TargetSource} for a specific bean, that bean will be proxied in any case.
 	 * <p>{@code TargetSourceCreators} can only be invoked if this post processor is used
 	 * in a {@link BeanFactory} and its {@link BeanFactoryAware} callback is triggered.
 	 *
-	 * @param targetSourceCreators the list of {@code TargetSourceCreators}.
-	 *                             Ordering is significant: The {@code TargetSource} returned from the first matching
-	 *                             {@code TargetSourceCreator} (that is, the first that returns non-null) will be used.
+	 * @param targetSourceCreators the list of {@code TargetSourceCreators}. Ordering is significant: The {@code TargetSource} returned from the first matching {@code TargetSourceCreator} (that is,
+	 *                             the first that returns non-null) will be used.
 	 */
 	public void setCustomTargetSourceCreators(TargetSourceCreator... targetSourceCreators) {
 		this.customTargetSourceCreators = targetSourceCreators;
 	}
 
 	/**
-	 * Set the common interceptors. These must be bean names in the current factory.
-	 * They can be of any advice or advisor type Spring supports.
+	 * Set the common interceptors. These must be bean names in the current factory. They can be of any advice or advisor type Spring supports.
 	 * <p>If this property isn't set, there will be zero common interceptors.
-	 * This is perfectly valid, if "specific" interceptors such as matching
-	 * Advisors are all we want.
+	 * This is perfectly valid, if "specific" interceptors such as matching Advisors are all we want.
 	 */
 	public void setInterceptorNames(String... interceptorNames) {
 		this.interceptorNames = interceptorNames;
 	}
 
 	/**
-	 * Set whether the common interceptors should be applied before bean-specific ones.
-	 * Default is "true"; else, bean-specific interceptors will get applied first.
+	 * Set whether the common interceptors should be applied before bean-specific ones. Default is "true"; else, bean-specific interceptors will get applied first.
 	 */
 	public void setApplyCommonInterceptorsFirst(boolean applyCommonInterceptorsFirst) {
 		this.applyCommonInterceptorsFirst = applyCommonInterceptorsFirst;
@@ -223,8 +204,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Return the owning {@link BeanFactory}.
-	 * May be {@code null}, as this post-processor doesn't need to belong to a bean factory.
+	 * Return the owning {@link BeanFactory}. May be {@code null}, as this post-processor doesn't need to belong to a bean factory.
 	 */
 	@Nullable
 	protected BeanFactory getBeanFactory() {
@@ -257,20 +237,21 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-        // 对于spring容器中所有bean的实例化之前，会调用后置处理器的此方法。
-        // 此类（自动代理创建器）会记录所有bean是否已经创建过代理对象、是否无需创建代理对象。也就是在 advisedBeans 中记录的。
+		// 对于spring容器中所有bean的实例化之前，会调用后置处理器的此方法。
+		// 此类（自动代理创建器）会记录所有bean是否已经创建过代理对象、是否无需创建代理对象。也就是在 advisedBeans 中记录的。
 
-
-        // 把beanName转成缓存所需的key
+		// 把beanName转成缓存所需的key
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
-            // 如果 已经增强的bean集合中 已经存在，则返回null.(返回null表示：继续默认的bean实例化流程)
+			// 如果 已经增强的bean集合中 已经存在，则返回null.(返回null表示：继续默认的bean实例化流程)
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-            // 如果当前类是 基础(infrastructure)类 或者 可以跳过，则在缓存中记录当前bean无需aop增强。
-			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
+			// 如果当前类是 基础(infrastructure)类 或者 可以跳过，则在缓存中记录当前bean无需aop增强。
+			if (isInfrastructureClass(beanClass)
+					|| shouldSkip(beanClass, beanName) // shouldSkip 子类重写了此方法
+			) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
 			}
@@ -311,8 +292,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Create a proxy with the configured interceptors if the bean is
-	 * identified as one to proxy by the subclass.
+	 * Create a proxy with the configured interceptors if the bean is identified as one to proxy by the subclass.
 	 *
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
@@ -333,10 +313,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	/**
 	 * Build a cache key for the given bean class and bean name.
 	 * <p>Note: As of 4.2.3, this implementation does not return a concatenated
-	 * class/name String anymore but rather the most efficient cache key possible:
-	 * a plain bean name, prepended with {@link BeanFactory#FACTORY_BEAN_PREFIX}
-	 * in case of a {@code FactoryBean}; or if no bean name specified, then the
-	 * given bean {@code Class} as-is.
+	 * class/name String anymore but rather the most efficient cache key possible: a plain bean name, prepended with {@link BeanFactory#FACTORY_BEAN_PREFIX} in case of a {@code FactoryBean}; or if no
+	 * bean name specified, then the given bean {@code Class} as-is.
 	 *
 	 * @param beanClass the bean class
 	 * @param beanName  the bean name
@@ -392,8 +370,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Return whether the given bean class represents an infrastructure class
-	 * that should never be proxied.
+	 * Return whether the given bean class represents an infrastructure class that should never be proxied.
 	 * <p>The default implementation considers Advices, Advisors and
 	 * AopInfrastructureBeans as infrastructure classes.
 	 *
@@ -416,8 +393,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Subclasses should override this method to return {@code true} if the
-	 * given bean should not be considered for auto-proxying by this post-processor.
+	 * Subclasses should override this method to return {@code true} if the given bean should not be considered for auto-proxying by this post-processor.
 	 * <p>Sometimes we need to be able to avoid this happening if it will lead to
 	 * a circular reference. This implementation returns {@code false}.
 	 *
@@ -430,8 +406,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Create a target source for bean instances. Uses any TargetSourceCreators if set.
-	 * Returns {@code null} if no custom TargetSource should be used.
+	 * Create a target source for bean instances. Uses any TargetSourceCreators if set. Returns {@code null} if no custom TargetSource should be used.
 	 * <p>This implementation uses the "customTargetSourceCreators" property.
 	 * Subclasses can override this method to use a different mechanism.
 	 *
@@ -451,7 +426,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 					// Found a matching TargetSource.
 					if (logger.isDebugEnabled()) {
 						logger.debug("TargetSourceCreator [" + tsc +
-								"] found custom TargetSource for bean with name '" + beanName + "'");
+											 "] found custom TargetSource for bean with name '" + beanName + "'");
 					}
 					return ts;
 				}
@@ -467,10 +442,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 *
 	 * @param beanClass            the class of the bean
 	 * @param beanName             the name of the bean
-	 * @param specificInterceptors the set of interceptors that is
-	 *                             specific to this bean (may be empty, but not null)
-	 * @param targetSource         the TargetSource for the proxy,
-	 *                             already pre-configured to access the bean
+	 * @param specificInterceptors the set of interceptors that is specific to this bean (may be empty, but not null)
+	 * @param targetSource         the TargetSource for the proxy, already pre-configured to access the bean
 	 * @return the AOP proxy for the bean
 	 * @see #buildAdvisors
 	 */
@@ -521,9 +494,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Return whether the Advisors returned by the subclass are pre-filtered
-	 * to match the bean's target class already, allowing the ClassFilter check
-	 * to be skipped when building advisors chains for AOP invocations.
+	 * Return whether the Advisors returned by the subclass are pre-filtered to match the bean's target class already, allowing the ClassFilter check to be skipped when building advisors chains for
+	 * AOP invocations.
 	 * <p>Default is {@code false}. Subclasses may override this if they
 	 * will always return pre-filtered Advisors.
 	 *
@@ -536,12 +508,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Determine the advisors for the given bean, including the specific interceptors
-	 * as well as the common interceptor, all adapted to the Advisor interface.
+	 * Determine the advisors for the given bean, including the specific interceptors as well as the common interceptor, all adapted to the Advisor interface.
 	 *
 	 * @param beanName             the name of the bean
-	 * @param specificInterceptors the set of interceptors that is
-	 *                             specific to this bean (may be empty, but not null)
+	 * @param specificInterceptors the set of interceptors that is specific to this bean (may be empty, but not null)
 	 * @return the list of Advisors for the given bean
 	 */
 	protected Advisor[] buildAdvisors(@Nullable String beanName, @Nullable Object[] specificInterceptors) {
@@ -563,7 +533,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			int nrOfCommonInterceptors = commonInterceptors.length;
 			int nrOfSpecificInterceptors = (specificInterceptors != null ? specificInterceptors.length : 0);
 			logger.debug("Creating implicit proxy for bean '" + beanName + "' with " + nrOfCommonInterceptors +
-					" common interceptors and " + nrOfSpecificInterceptors + " specific interceptors");
+								 " common interceptors and " + nrOfSpecificInterceptors + " specific interceptors");
 		}
 
 		Advisor[] advisors = new Advisor[allInterceptors.size()];
@@ -593,31 +563,23 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Subclasses may choose to implement this: for example,
-	 * to change the interfaces exposed.
+	 * Subclasses may choose to implement this: for example, to change the interfaces exposed.
 	 * <p>The default implementation is empty.
 	 *
-	 * @param proxyFactory a ProxyFactory that is already configured with
-	 *                     TargetSource and interfaces and will be used to create the proxy
-	 *                     immediately after this method returns
+	 * @param proxyFactory a ProxyFactory that is already configured with TargetSource and interfaces and will be used to create the proxy immediately after this method returns
 	 */
 	protected void customizeProxyFactory(ProxyFactory proxyFactory) {
 	}
 
 
 	/**
-	 * Return whether the given bean is to be proxied, what additional
-	 * advices (e.g. AOP Alliance interceptors) and advisors to apply.
+	 * Return whether the given bean is to be proxied, what additional advices (e.g. AOP Alliance interceptors) and advisors to apply.
 	 *
 	 * @param beanClass          the class of the bean to advise
 	 * @param beanName           the name of the bean
-	 * @param customTargetSource the TargetSource returned by the
-	 *                           {@link #getCustomTargetSource} method: may be ignored.
-	 *                           Will be {@code null} if no custom target source is in use.
-	 * @return an array of additional interceptors for the particular bean;
-	 * or an empty array if no additional interceptors but just the common ones;
-	 * or {@code null} if no proxy at all, not even with the common interceptors.
-	 * See constants DO_NOT_PROXY and PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS.
+	 * @param customTargetSource the TargetSource returned by the {@link #getCustomTargetSource} method: may be ignored. Will be {@code null} if no custom target source is in use.
+	 * @return an array of additional interceptors for the particular bean; or an empty array if no additional interceptors but just the common ones; or {@code null} if no proxy at all, not even with
+	 * the common interceptors. See constants DO_NOT_PROXY and PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS.
 	 * @throws BeansException in case of errors
 	 * @see #DO_NOT_PROXY
 	 * @see #PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS

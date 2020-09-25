@@ -97,6 +97,8 @@ public abstract class AopConfigUtils {
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 
+		// 容器中注册 AnnotationAwareAspectJAutoProxyCreator，它是一个 InstantiationAwareBeanPostProcessor
+		// bean 实例化后就会调用到 postProcessAfterInstantiation 方法
 		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
 	}
 
