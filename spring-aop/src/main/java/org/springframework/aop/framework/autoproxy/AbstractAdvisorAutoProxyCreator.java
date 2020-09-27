@@ -94,14 +94,17 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 		// 找到要在自动代理中使用的所有候选 advisor。
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+
 		// 搜索给定的候选 advisor，找到可以应用于指定 bean 的所有 advisor。
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+
 		// 扩展用的hook方法，子类可以覆盖以注册其他Advisors，默认实现为空。
 		// 这里调用的是AspectJAwareAdvisorAutoProxyCreator类中的实现
 		// 将 ExposeInvocationInterceptor 添加到 advice chain（链）的开头。 使用AspectJ表达式切入点和使用AspectJ样式的 advice 时，需要这些额外的 advice。
 		extendAdvisors(eligibleAdvisors);
+
 		if (!eligibleAdvisors.isEmpty()) {
-			// 排序 advisor
+			// 排序 advisor（排出来为 Around, Before, After, AfterReturning, AfterThrowing 的倒序）
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
 		}
 		return eligibleAdvisors;
@@ -113,6 +116,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findCandidateAdvisors() {
 		Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
+
+		// 找到所有AdvisorBeans
 		return this.advisorRetrievalHelper.findAdvisorBeans();
 	}
 

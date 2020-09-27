@@ -444,6 +444,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 			// 这其中调用了 AbstractAutoProxyCreator 的 postProcessAfterInitialization
 			// AbstractAutoProxyCreator 中会缓存创建过代理的对象
+			// 这里为bean创建动态代理
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
 				return result;
@@ -1868,6 +1869,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 			// 这其中调用了 AbstractAutoProxyCreator 的 postProcessAfterInitialization
 			// AbstractAutoProxyCreator 中会缓存创建过代理的对象
+			// 这里为bean创建动态代理
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 

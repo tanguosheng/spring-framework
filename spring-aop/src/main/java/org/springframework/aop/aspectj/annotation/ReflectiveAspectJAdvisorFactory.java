@@ -133,8 +133,11 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 		// 获取切面类里的增强方法。其实是排除Pointcut注解的其他方法，所以下面还需具体要判断是否为切面方法。
         List<Method> advisorMethods = getAdvisorMethods(aspectClass);
+
         // 遍历所有的 候选增强方法，并找到真实的增强方法，保存到 advisors list 中。
         for (Method candidateAdviceMethod : advisorMethods) {
+
+        	// 构造 Advisor，advisors.size()这个是顺序，每加一个进去，Advisor 构造出来的顺序值+1
 			Advisor advisor = getAdvisor(candidateAdviceMethod, lazySingletonAspectInstanceFactory, advisors.size(), aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
@@ -168,12 +171,14 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	private List<Method> getAdvisorMethods(Class<?> aspectClass) {
 		final List<Method> methods = new ArrayList<>();
 		ReflectionUtils.doWithMethods(aspectClass, method -> {
-			// 排除 pointcuts 方法。AnnotationUtils.getAnnotation(method, Pointcut.class) 为null说明，方法上没有 @Pointcut 注解
+			// 排除 pointcuts 方法。
+			// AnnotationUtils.getAnnotation(method, Pointcut.class) 为null说明，方法上没有 @Pointcut 注解
 			if (AnnotationUtils.getAnnotation(method, Pointcut.class) == null) {
 				methods.add(method);
 			}
 		});
-        // 为增强方法排序
+        // 为增强方法排序，这里不是最终调用的顺序
+		// 顺序为：Around, Before, After, AfterReturning, AfterThrowing
         methods.sort(METHOD_COMPARATOR);
 		return methods;
 	}
@@ -211,17 +216,22 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
 
-		AspectJExpressionPointcut expressionPointcut = getPointcut(candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
+		// 获取当前通知的切点表达式
+		AspectJExpressionPointcut expressionPointcut =
+				getPointcut(candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
+
 		if (expressionPointcut == null) {
 			return null;
 		}
 
+		// 实例化一个Advisor 它包含 Pointcut 等重要信息
 		return new InstantiationModelAwarePointcutAdvisorImpl(expressionPointcut, candidateAdviceMethod,
 				this, aspectInstanceFactory, declarationOrderInAspect, aspectName);
 	}
 
 	@Nullable
 	private AspectJExpressionPointcut getPointcut(Method candidateAdviceMethod, Class<?> candidateAspectClass) {
+
         // 从 候选增强方法 上找aop的注解，如果没有aop的指定注解，就说明此 候选方法并不是aop的增强方法。
 		AspectJAnnotation<?> aspectJAnnotation = AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
@@ -248,6 +258,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		Class<?> candidateAspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
 		validate(candidateAspectClass);
 
+		// 获取切面方法上的注解
 		AspectJAnnotation<?> aspectJAnnotation = AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
 			return null;

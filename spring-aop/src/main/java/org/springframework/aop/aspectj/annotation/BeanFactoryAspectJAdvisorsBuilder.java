@@ -139,18 +139,26 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						}
 						// 判断当前bean是否是切面(Aspect)，如果是切面，就使用
 						if (this.advisorFactory.isAspect(beanClass)) {
+
 							aspectNames.add(beanName);
 							AspectMetadata amd = new AspectMetadata(beanClass, beanName);
-                            // 当切面类注释的@Aspect注解value属性为空 并且 父类为Object时，getKind() 就是 PerClauseKind.SINGLETON。也就是多数情况都是走if成立的逻辑。
+
+							// 当切面类注释的@Aspect注解value属性为空 并且 父类为Object时，getKind() 就是 PerClauseKind.SINGLETON。
+							// 也就是多数情况都是走if成立的逻辑。
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
                                 MetadataAwareAspectInstanceFactory factory = new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
-								// 解析切面类（存在@Aspect注解的类）中的增强器。比如标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法。
+
+                                // 解析切面类（存在@Aspect注解的类）中的增强器。
+								// 比如标注了 @Around, @Before, @After, @AfterReturning, @AfterThrowing 注解的方法。
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+
 								if (this.beanFactory.isSingleton(beanName)) {
-                                    // 注释1：如果当前切面bean是单例的，则把解析出来的 增强器 缓存起来。以后从缓存中根据切面beanName获取就行了。
+									// 注释1：如果当前切面bean是单例的，
+									// 则把解析出来的 增强器 缓存起来。以后从缓存中根据切面beanName获取就行了。
 									this.advisorsCache.put(beanName, classAdvisors);
 								} else {
-								    // 注释2：如果当前切面bean 不是单例的，则在 aspectFactoryCache 缓存中记录一个 ‘切面实例化工程factory’ BeanFactoryAspectInstanceFactory
+									// 注释2：如果当前切面bean 不是单例的，
+									// 则在 aspectFactoryCache 缓存中记录一个 ‘切面实例化工程factory’ BeanFactoryAspectInstanceFactory
 									this.aspectFactoryCache.put(beanName, factory);
 								}
 								advisors.addAll(classAdvisors);

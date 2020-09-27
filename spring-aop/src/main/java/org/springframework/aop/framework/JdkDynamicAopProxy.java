@@ -120,6 +120,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		}
 		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised, true);
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
+
+		// 注意这里传入的 this， 那么 InvocationHandler 就是当前对象
 		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
 	}
 
@@ -161,6 +163,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		Object target = null;
 
 		try {
+
+			// 忽略一些方法不代理
 			if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {
 				// The target does not implement the equals(Object) method itself.
 				return equals(args[0]);
@@ -183,6 +187,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 			if (this.advised.exposeProxy) {
 				// Make invocation available if necessary.
+				// 通过设置 exposeProxy 来暴露动态代理对象，
+				// 在使用时可以通过 AopContext 来获取动态代理对象，这样就可以避免在调用本类方法时没有被代理包裹的问题
 				oldProxy = AopContext.setCurrentProxy(proxy);
 				setProxyContext = true;
 			}
