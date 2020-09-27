@@ -1,3 +1,7 @@
+# 这里是我和小伙伴整理的spring源码注释项目
+# 如有不正，欢迎交流！~
+### 请积极地发邮件指正注释中的错误，不胜感激！~  guosheng.tan@foxmail.com
+
 # <img src="src/docs/asciidoc/images/spring-framework.png" width="80" height="80"> Spring Framework
 
 This is the home of the Spring Framework, the foundation for all
