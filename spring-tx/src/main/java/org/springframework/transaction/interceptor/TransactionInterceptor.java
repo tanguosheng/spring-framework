@@ -31,14 +31,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * AOP Alliance MethodInterceptor for declarative transaction
- * management using the common Spring transaction infrastructure
- * ({@link org.springframework.transaction.PlatformTransactionManager}).
+ * AOP Alliance MethodInterceptor for declarative transaction management using the common Spring transaction infrastructure ({@link org.springframework.transaction.PlatformTransactionManager}).
  *
  * <p>Derives from the {@link TransactionAspectSupport} class which
- * contains the integration with Spring's underlying transaction API.
- * TransactionInterceptor simply calls the relevant superclass methods
- * such as {@link #invokeWithinTransaction} in the correct order.
+ * contains the integration with Spring's underlying transaction API. TransactionInterceptor simply calls the relevant superclass methods such as {@link #invokeWithinTransaction} in the correct
+ * order.
  *
  * <p>TransactionInterceptors are thread-safe.
  *
@@ -54,6 +51,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 	/**
 	 * Create a new TransactionInterceptor.
 	 * <p>Transaction manager and transaction attributes still need to be set.
+	 *
 	 * @see #setTransactionManager
 	 * @see #setTransactionAttributes(java.util.Properties)
 	 * @see #setTransactionAttributeSource(TransactionAttributeSource)
@@ -63,7 +61,8 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 
 	/**
 	 * Create a new TransactionInterceptor.
-	 * @param ptm the default transaction manager to perform the actual transaction management
+	 *
+	 * @param ptm        the default transaction manager to perform the actual transaction management
 	 * @param attributes the transaction attributes in properties format
 	 * @see #setTransactionManager
 	 * @see #setTransactionAttributes(java.util.Properties)
@@ -75,6 +74,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 
 	/**
 	 * Create a new TransactionInterceptor.
+	 *
 	 * @param ptm the default transaction manager to perform the actual transaction management
 	 * @param tas the attribute source to be used to find transaction attributes
 	 * @see #setTransactionManager
@@ -85,7 +85,13 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		setTransactionAttributeSource(tas);
 	}
 
-
+	/**
+	 * 事务的Aop调用到这里
+	 *
+	 * @param invocation the method invocation joinpoint
+	 * @return
+	 * @throws Throwable
+	 */
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {

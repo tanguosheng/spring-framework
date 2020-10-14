@@ -26,22 +26,29 @@ import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 /**
- * {@code @Configuration} class that registers the Spring infrastructure beans
- * necessary to enable proxy-based annotation-driven transaction management.
+ * {@code @Configuration} class that registers the Spring infrastructure beans necessary to enable proxy-based annotation-driven transaction management.
  *
  * @author Chris Beams
- * @since 3.1
  * @see EnableTransactionManagement
  * @see TransactionManagementConfigurationSelector
+ * @since 3.1
  */
 @Configuration
 public class ProxyTransactionManagementConfiguration extends AbstractTransactionManagementConfiguration {
 
+	/**
+	 * 导入了关于事务的切面信息
+	 *
+	 * @return
+	 */
 	@Bean(name = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public BeanFactoryTransactionAttributeSourceAdvisor transactionAdvisor() {
+		// 事务用advisor
 		BeanFactoryTransactionAttributeSourceAdvisor advisor = new BeanFactoryTransactionAttributeSourceAdvisor();
+		// 设置事务属性源
 		advisor.setTransactionAttributeSource(transactionAttributeSource());
+		// 设置Advice
 		advisor.setAdvice(transactionInterceptor());
 		if (this.enableTx != null) {
 			advisor.setOrder(this.enableTx.<Integer>getNumber("order"));
@@ -49,6 +56,12 @@ public class ProxyTransactionManagementConfiguration extends AbstractTransaction
 		return advisor;
 	}
 
+
+	/**
+	 * 事务属性源对象：用于解析@Transactional
+	 *
+	 * @return
+	 */
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public TransactionAttributeSource transactionAttributeSource() {

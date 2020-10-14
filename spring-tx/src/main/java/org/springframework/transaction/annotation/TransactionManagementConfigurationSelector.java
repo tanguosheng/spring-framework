@@ -44,6 +44,10 @@ public class TransactionManagementConfigurationSelector extends AdviceModeImport
 	protected String[] selectImports(AdviceMode adviceMode) {
 		switch (adviceMode) {
 			case PROXY:
+				// 为我们的容器导入两个组件：
+				// 1. AutoProxyRegistrar：注册 InfrastructureAdvisorAutoProxyCreator bean后置处理器，
+				// 	  但同时开启aop和事务，这个处理器会被aop的后置处理器覆盖掉
+				// 2. ProxyTransactionManagementConfiguration：向容器中注册事务用的 BeanFactoryTransactionAttributeSourceAdvisor
 				return new String[] {AutoProxyRegistrar.class.getName(),
 						ProxyTransactionManagementConfiguration.class.getName()};
 			case ASPECTJ:

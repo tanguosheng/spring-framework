@@ -54,6 +54,7 @@ public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 	 * {@code proxyTargetClass} attributes, the APC can be registered and configured all
 	 * the same.
 	 */
+	// 在 refresh 时候调用 invokeBeanFactoryPostProcessors 调用进这个方法
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 		boolean candidateFound = false;
@@ -69,6 +70,7 @@ public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 					Boolean.class == proxyTargetClass.getClass()) {
 				candidateFound = true;
 				if (mode == AdviceMode.PROXY) {
+					// 注册 InfrastructureAdvisorAutoProxyCreator bean后置处理器
 					AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);
 					if ((Boolean) proxyTargetClass) {
 						AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);

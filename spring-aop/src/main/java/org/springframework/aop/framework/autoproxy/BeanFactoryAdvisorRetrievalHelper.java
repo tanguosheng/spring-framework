@@ -72,6 +72,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the auto-proxy creator apply to them!
 			// 不要在这里初始化FactoryBeans：我们需要保留所有常规未初始化bean，以让自动代理创建者适用于它们！
+			// 获取所有实现了Advisor的Bean，如果开启了事务，这里会拿到 BeanFactoryTransactionAttributeSourceAdvisor
 			advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 					this.beanFactory, Advisor.class, true, false);
 			this.cachedAdvisorBeanNames = advisorNames;
@@ -82,6 +83,8 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 		List<Advisor> advisors = new ArrayList<>();
 		for (String name : advisorNames) {
+
+			// 根据 BeanDefinition 的 Role 判断是否是合适的 advisor
 			if (isEligibleBean(name)) {
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isDebugEnabled()) {

@@ -58,7 +58,7 @@ public abstract class AopConfigUtils {
 
 	static {
 		// Set up the escalation list...
-		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
+		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class); // 事务用
 		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
 		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
 	}
@@ -123,6 +123,7 @@ public abstract class AopConfigUtils {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 
 		// 如果已经存在了自动代理创建器且存在的自动代理创建器与现在的不一致，那么需要根据优先级来判断到底需要使用哪个
+		// 比如同时开启aop和事务
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			// AUTO_PROXY_CREATOR_BEAN_NAME = "org.springframework.aop.config.internalAutoProxyCreator";
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
