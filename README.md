@@ -4,6 +4,29 @@
 
 # <img src="src/docs/asciidoc/images/spring-framework.png" width="80" height="80"> Spring Framework
 
+
+如何导入idea：
+
+用以下链接下载 gradle 4.9 版本（radle-src为gralde源码，gradle-bin为安装包，gradle-all为源码加安装包）
+(idea 自带的 gradle 版本可能更新（5.0）或者更老，会有各种编译问题)
+https://services.gradle.org/distributions/gradle-4.9-bin.zip
+
+配置环境变量：
+GRADLE_HOME=/Users/***/tools/gradle-4.9
+Path引入环境变量，例子如下：
+PATH=$GRADLE_HOME/bin:$PATH:.
+
+命令行 gradle -v 检测 gradle 是否安装成功。。。
+
+idea -> Preferences | Build, Execution, Deployment | Build Tools | Gradle 配置为自己下载的gradle地址（idea）
+
+jdk版本为1.8， 我的为1.8.0_161-b12，可以编译成功
+
+跑一下 build.gradle，等到片刻 即可... 
+
+P.s.: 此源码编译配置和官方不完全一致，有适当的增删
+
+
 This is the home of the Spring Framework, the foundation for all
 [Spring projects](https://spring.io/projects). Together the Spring Framework and the family of Spring projects make up what we call "Spring". 
 
