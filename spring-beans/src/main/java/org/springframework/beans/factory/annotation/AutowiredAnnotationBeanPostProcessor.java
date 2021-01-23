@@ -65,6 +65,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.inject.Inject;
+
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
  * that autowires annotated fields, setter methods and arbitrary config methods.
@@ -120,14 +122,27 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+    /**
+     * <pre>
+     * 表示此类会处理spring bean中的哪些注解.
+     * 默认有三个:{@link Autowired} {@link Value} {@link Inject}.
+     * 详见:{@link AutowiredAnnotationBeanPostProcessor#AutowiredAnnotationBeanPostProcessor()}
+     * </pre>
+     */
 	private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet<>(4);
 
+    /**
+     * {@link Autowired#required()}
+     */
 	private String requiredParameterName = "required";
 
 	private boolean requiredParameterValue = true;
 
 	private int order = Ordered.LOWEST_PRECEDENCE - 2;
 
+    /**
+     * @see BeanFactoryAware
+     */
 	@Nullable
 	private ConfigurableListableBeanFactory beanFactory;
 
@@ -148,8 +163,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		this.autowiredAnnotationTypes.add(Autowired.class);
 		this.autowiredAnnotationTypes.add(Value.class);
 		try {
-			this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
-					ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
+			this.autowiredAnnotationTypes.add((Class<? extends Annotation>) ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
 			logger.info("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
 		}
 		catch (ClassNotFoundException ex) {
@@ -218,8 +232,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
-			throw new IllegalArgumentException(
-					"AutowiredAnnotationBeanPostProcessor requires a ConfigurableListableBeanFactory: " + beanFactory);
+			throw new IllegalArgumentException("AutowiredAnnotationBeanPostProcessor requires a ConfigurableListableBeanFactory: " + beanFactory);
 		}
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 	}
@@ -294,8 +307,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 							Class<?> userClass = ClassUtils.getUserClass(beanClass);
 							if (userClass != beanClass) {
 								try {
-									Constructor<?> superCtor =
-											userClass.getDeclaredConstructor(candidate.getParameterTypes());
+									Constructor<?> superCtor = userClass.getDeclaredConstructor(candidate.getParameterTypes());
 									ann = findAutowiredAnnotation(superCtor);
 								}
 								catch (NoSuchMethodException ex) {
@@ -412,6 +424,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
+                    // 通过clazz构建注入原数据对象,并保存到缓存中.
 					metadata = buildAutowiringMetadata(clazz);
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
@@ -427,53 +440,62 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
-			ReflectionUtils.doWithLocalFields(targetClass, field -> {
-				AnnotationAttributes ann = findAutowiredAnnotation(field);
-				if (ann != null) {
-					if (Modifier.isStatic(field.getModifiers())) {
-						if (logger.isWarnEnabled()) {
-							logger.warn("Autowired annotation is not supported on static fields: " + field);
-						}
-						return;
-					}
-					boolean required = determineRequiredStatus(ann);
-					currElements.add(new AutowiredFieldElement(field, required));
-				}
-			});
-
-			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
-				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
-				if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
-					return;
-				}
-				AnnotationAttributes ann = findAutowiredAnnotation(bridgedMethod);
-				if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
-					if (Modifier.isStatic(method.getModifiers())) {
-						if (logger.isWarnEnabled()) {
-							logger.warn("Autowired annotation is not supported on static methods: " + method);
-						}
-						return;
-					}
-					if (method.getParameterCount() == 0) {
-						if (logger.isWarnEnabled()) {
-							logger.warn("Autowired annotation should only be used on methods with parameters: " +
-									method);
-						}
-					}
-					boolean required = determineRequiredStatus(ann);
-					PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
-					currElements.add(new AutowiredMethodElement(method, required, pd));
-				}
-			});
+			ReflectionUtils.doWithLocalFields(targetClass, field -> buildAutowiringMetadataWithFields(currElements, field));
+			ReflectionUtils.doWithLocalMethods(targetClass, method -> buildAutowiringMetadataWithMethods(currElements, clazz, method));
 
 			elements.addAll(0, currElements);
-			targetClass = targetClass.getSuperclass();
 		}
-		while (targetClass != null && targetClass != Object.class);
+		while ((targetClass = targetClass.getSuperclass()) != null && targetClass != Object.class);// 如果目标类的父类不为空并且不是Object类,则继续解析父类中的元数据.
 
 		return new InjectionMetadata(clazz, elements);
 	}
 
+    private void buildAutowiringMetadataWithFields(final List<InjectionMetadata.InjectedElement> currElements, Field field) {
+        AnnotationAttributes ann = findAutowiredAnnotation(field);
+        if (ann != null) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Autowired annotation is not supported on static fields: " + field);
+                }
+                return;
+            }
+            // 获取 @Autowired 注解的 required 属性值.默认true
+            boolean required = determineRequiredStatus(ann);
+            currElements.add(new AutowiredFieldElement(field, required));
+        }
+    }
+
+    private void buildAutowiringMetadataWithMethods(final List<InjectionMetadata.InjectedElement> currElements, Class<?> clazz, Method method) {
+        Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
+        if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
+            return;
+        }
+
+        AnnotationAttributes ann = findAutowiredAnnotation(bridgedMethod);
+        if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Autowired annotation is not supported on static methods: " + method);
+                }
+                return;
+            }
+            if (method.getParameterCount() == 0) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Autowired annotation should only be used on methods with parameters: " + method);
+                }
+            }
+            // 获取 @Autowired 注解的 required 属性值.默认true
+            boolean required = determineRequiredStatus(ann);
+            PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
+            currElements.add(new AutowiredMethodElement(method, required, pd));
+        }
+    }
+
+    /**
+     * 获取当前方法上的 @Autowired 或 @Value 或 @javax.inject.Inject 注解.
+     *
+     * @see #autowiredAnnotationTypes autowiredAnnotationTypes这个Set中存放了 @Autowired 和 @Value 和 @javax.inject.Inject 注解
+     */
 	@Nullable
 	private AnnotationAttributes findAutowiredAnnotation(AccessibleObject ao) {
 		if (ao.getAnnotations().length > 0) {  // autowiring annotations have to be local

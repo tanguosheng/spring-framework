@@ -373,6 +373,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 					}
 					if (!getRegistry().containsBeanDefinition(beanName)) {
 						// If we haven't already registered it...
+                        // 如果此beanName不存在与注册器中,则注册一个BeanDefinition
 						registerBeanDefinition(beanName, map, prefix + beanName, resourceDescription);
 						++beanCount;
 					}
