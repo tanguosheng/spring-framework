@@ -227,11 +227,15 @@ public class AutowiredConfigurationTests {
 	@Configuration
 	static class AutowiredConfig {
 
+        /**
+         * fixme:Configuration注解的类中,应该是可以使用 @Autowired 注解的,但是这里为什么报错呢?
+         */
 		@Autowired
 		private Colour colour;
 
 		@Bean
 		public TestBean testBean() {
+		    // fixme:这里 空指针了, 为什么?
 			return new TestBean(colour.toString());
 		}
 	}
