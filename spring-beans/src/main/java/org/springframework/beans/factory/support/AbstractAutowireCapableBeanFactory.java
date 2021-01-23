@@ -608,19 +608,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// getEarlyBeanReference() 调用 SmartInstantiationAwareBeanPostProcessor 的 getEarlyBeanReference()方法
 			// 其中我们熟知的AOP就是在这里将advice动态织入bean中，若没有则直接返回bean，不做任何处理
 			// if (!this.singletonObjects.containsKey(beanName)) {
-			// 放入三级缓存	this.singletonFactories.put(beanName, singletonFactory);
-			// 移除二级缓存	this.earlySingletonObjects.remove(beanName);
+			// 放入三级缓存(singletonFactories)	this.singletonFactories.put(beanName, singletonFactory);
+			// 移除二级缓存(earlySingletonObjects)	this.earlySingletonObjects.remove(beanName);
 			// 				this.registeredSingletons.add(beanName);
 			// }
 
 			// 在一开始调用getSingleton时拿不到bean实例就会被标记为创建中，
-			// 那么如果是单例bean,并且在创建中（第一次创建时）就会加入到三级缓存中去。
+			// 那么如果是单例bean,并且在创建中（第一次创建时）就会加入到三级缓存(singletonFactories)中去。
 			// 在发现了循环依赖时(调用了下面的populateBean自动注入其他bean，其他bean又注入了当前bean),
-			// 会从三级缓存中获取工厂方法后调用getObject,生成具有代理包裹(如果有需要)的bean后加入到二级缓存中，再把三级缓存的工厂删掉
+			// 会从三级缓存(singletonFactories)中获取工厂方法后调用getObject,生成具有代理包裹(如果有需要)的bean后加入到二级缓存(earlySingletonObjects)中，再把三级缓存(singletonFactories)的工厂删掉
 
 			// 这里把bean实例用ObjectFactory包装了一下,工厂中调用getEarlyBeanReference方法提供返回bean代理实例的能力
-			// 然后删除二级缓存、加入三级缓存
-			// 其实就是加入三级缓存
+			// 然后删除二级缓存(earlySingletonObjects)、加入三级缓存(singletonFactories)
+			// 其实就是加入三级缓存(singletonFactories)
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -630,14 +630,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			// 对bean进行填充，将各个属性值注入，
 			// 其中，可能存在依赖于其他bean的属性，则会递归初始依赖bean
-			// 从这个方法返回后，当前bean实例就不一定在二级或者三级缓存中了。
-			// 因为如果有循环依赖的情况，就会被移到二级缓存中，如果没有，那么应该还是在三级缓存中
+			// 从这个方法返回后，当前bean实例就不一定在二级或者三级缓存(singletonFactories)中了。
+			// 因为如果有循环依赖的情况，就会被移到二级缓存(earlySingletonObjects)中，如果没有，那么应该还是在三级缓存(singletonFactories)中
 			// 这里直接操作bean的直接实例，而不是代理实例
 			populateBean(beanName, mbd, instanceWrapper);
 
 			// 初始化bean，比如调用init-method
 			// 这个方法中会尽可能的调用 AbstractAutoProxyCreator 的 postProcessAfterInitialization 方法
-			// 如果当前 bean 没被循环引用，那么三级缓存是用不上的，也就生成不了 proxy
+			// 如果当前 bean 没被循环引用，那么三级缓存(singletonFactories)是用不上的，也就生成不了 proxy
 			// 这里直接调用 AbstractAutoProxyCreator 的 postProcessAfterInitialization 方法生成 proxy
 			// AbstractAutoProxyCreator 会记录哪些类创建过 proxy 而不再重复创建代理（被循环引用的类不会在这里重复创建代理）
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
@@ -654,7 +654,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 不一样的是，走到这里此时已经解决完循环依赖问题了(bean的属性已经被填充完了)、也可能根本就没有循环依赖问题
 		if (earlySingletonExposure) {
 
-			// allowEarlyReference = false, 从一级和二级缓存中获取
+			// allowEarlyReference = false, 从一级和二级缓存(earlySingletonObjects)中获取
 			// 如果拿到了，说明bean是个被代理过的bean
 			Object earlySingletonReference = getSingleton(beanName, false);
 

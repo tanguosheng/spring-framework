@@ -201,21 +201,21 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		// 先尝试从一级缓存中获取
+		// 先尝试从一级缓存(singletonObjects)中获取
 		// 如果拿到了，说明拿到的Bean不是当前创建链中的bean，直接返回就行了
 		Object singletonObject = this.singletonObjects.get(beanName);
 		// 如果没有拿到，并且这个bean还正在创建中...
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			// DefaultSingletonBeanRegistry 类的 singletonObjects 属性持有所有已经实例化的singleton集合（ConcurrentHashMap）
 			synchronized (this.singletonObjects) {
-				// 尝试从二级缓存中获取
+				// 尝试从二级缓存(earlySingletonObjects)中获取
 				singletonObject = this.earlySingletonObjects.get(beanName);
 
 				// allowEarlyReference 这个变量很奇妙，需要注意传进来的是什么值，策略不同
-				// 如果二级缓存中没拿到，并且此次getSingleton允许获取提前曝光的Reference
+				// 如果二级缓存(earlySingletonObjects)中没拿到，并且此次getSingleton允许获取提前曝光的Reference
 				if (singletonObject == null && allowEarlyReference) {
 
-					// 从三级缓存中获取创建bean的 ObjectFactory, 这个 ObjectFactory 是带有创建代理能力的
+					// 从三级缓存(singletonFactories)中获取创建bean的 ObjectFactory, 这个 ObjectFactory 是带有创建代理能力的
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
 
@@ -223,10 +223,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 						// 这里调用getObject是把代理应用到实例上，返回一个包裹好的bean，可能是代理对象，也可能是bean实例自己本身
 						singletonObject = singletonFactory.getObject();
 
-						// 加入二级缓存, 二级缓存中的bean已经是被代理包裹的bean了
+						// 加入二级缓存(earlySingletonObjects), 二级缓存(earlySingletonObjects)中的bean已经是被代理包裹的bean了
 						this.earlySingletonObjects.put(beanName, singletonObject);
 
-						// 删除三级缓存
+						// 删除三级缓存(singletonFactories)
 						this.singletonFactories.remove(beanName);
 					}
 				}
@@ -253,7 +253,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			// 如果直接拿到了就是已经创建好的不需要再创建直接返回，如果拿不到就创建
 			// 拿到了可能是因为并发调用getBean(A)时发生的。
 			// 在 AbstractBeanFactory#doGetBean()时，第一次调用拿不到bean，到这里准备创建Bean，
-			// 但是已经被其他线程创建好放在一级缓存了，这里取来直接用就行了
+			// 但是已经被其他线程创建好放在一级缓存(singletonObjects)了，这里取来直接用就行了
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
 				// singletonsCurrentlyInDestruction = false; 优雅关闭 Context 删除缓存的单例时会修改为true
@@ -298,11 +298,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					// 到这里已经是创建完整的实例了，添加到一级缓存，移除其他级缓存
+					// 到这里已经是创建完整的实例了，添加到一级缓存(singletonObjects)，移除其他级缓存
 
-					// 添加一级缓存: 					this.singletonObjects.put(beanName, singletonObject);
-					// 移除三级缓存: 					this.singletonFactories.remove(beanName);
-					// 移除二级缓存: 					this.earlySingletonObjects.remove(beanName);
+					// 添加一级缓存(singletonObjects): 					this.singletonObjects.put(beanName, singletonObject);
+					// 移除三级缓存(singletonFactories): 					this.singletonFactories.remove(beanName);
+					// 移除二级缓存(earlySingletonObjects): 					this.earlySingletonObjects.remove(beanName);
 					// 记录已经注册到容器中bean的名字: 	this.registeredSingletons.add(beanName);
 					addSingleton(beanName, singletonObject);
 				}
