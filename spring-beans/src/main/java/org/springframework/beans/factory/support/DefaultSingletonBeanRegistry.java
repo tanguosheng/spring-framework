@@ -72,6 +72,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * Cache of singleton objects: bean name --> bean instance
+     * 单例的spring bean
+     *
+     * 概念明确:
+     * 一、spring bean:经过spring创建bean整个过程的[java对象],称为[spring bean].
+     * 二、java对象:不在spring容器中管理的java实例对象,或者尚未经过spring创建bean整个过程的java对象,称为java对象.
+     *             如果经过spring创建bean整个过程的[java对象],可以称之为[spring bean].
+     * (来源于 鲁班学院-子路老师 https://www.bilibili.com/video/BV1uE411d7L5?p=2)
 	 */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
@@ -149,18 +156,26 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Add the given singleton object to the singleton cache of this factory.
-	 * <p>To be called for eager registration of singletons.
-	 *
+     * <pre>
+     * Add the given singleton object to the singleton cache of this factory.
+     * To be called for eager registration of singletons.
+     *
+     * 把一个给定的单例的java对象,添加到单例缓存池(singletonObjects)中,
+     *
+     * 画外音:也是在此刻,一个[java对象]已经经历过整个spring生命周期,正式称为[spring bean]!!!
+     * 画外音:[java对象]和[spring bean]概念区别,见:{@link DefaultSingletonBeanRegistry#singletonObjects}
+     * </pre>
+     *
 	 * @param beanName        the name of the bean
 	 * @param singletonObject the singleton object
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
 			this.singletonObjects.put(beanName, singletonObject);
-			this.singletonFactories.remove(beanName);
+            this.registeredSingletons.add(beanName);
+
+            this.singletonFactories.remove(beanName);
 			this.earlySingletonObjects.remove(beanName);
-			this.registeredSingletons.add(beanName);
 		}
 	}
 
@@ -201,12 +216,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		// 先尝试从一级缓存(singletonObjects)中获取
-		// 如果拿到了，说明拿到的Bean不是当前创建链中的bean，直接返回就行了
+		// 先尝试从一级缓存(singletonObjects)中获取spring bean
+		// 如果不为null，说明拿到的spring Bean已经经历了整个spring bean创建、初始化的过程.则直接return即可.
 		Object singletonObject = this.singletonObjects.get(beanName);
-		// 如果没有拿到，并且这个bean还正在创建中...
+		// 如果没有拿到，并且这个单例bean还正在创建中(isSingletonCurrentlyInCreation)...
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
-			// DefaultSingletonBeanRegistry 类的 singletonObjects 属性持有所有已经实例化的singleton集合（ConcurrentHashMap）
+			// DefaultSingletonBeanRegistry 类的 singletonObjects 属性持有所有已经实例化的singleton spring bean集合（ConcurrentHashMap）
 			synchronized (this.singletonObjects) {
 				// 尝试从二级缓存(earlySingletonObjects)中获取
 				singletonObject = this.earlySingletonObjects.get(beanName);

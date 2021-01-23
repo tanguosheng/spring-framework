@@ -19,6 +19,9 @@ package org.springframework.beans.factory.config;
 import org.springframework.lang.Nullable;
 
 /**
+ *
+ * 单例bean注册中心
+ *
  * Interface that defines a registry for shared bean instances.
  * Can be implemented by {@link org.springframework.beans.factory.BeanFactory}
  * implementations in order to expose their singleton management facility
@@ -126,7 +129,19 @@ public interface SingletonBeanRegistry {
 	int getSingletonCount();
 
 	/**
-	 * Return the singleton mutex used by this registry (for external collaborators).
+     * <pre>
+     * Return the singleton mutex used by this registry (for external collaborators).
+     * 返回当前单例注册器的 mutex
+     *
+     * 理解:
+     * {@code
+     *         Object mutex = new Object();
+     *         synchronized(mutex) { // synchronized加锁,需要指定一个对象,这个对象就可以理解为 mutext.
+     *
+     *         }
+     * }
+     *
+     * </pre>
 	 * @return the mutex object (never {@code null})
 	 * @since 4.2
 	 */
