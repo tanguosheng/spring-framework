@@ -180,6 +180,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+     * 添加单例bean的工厂
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -191,8 +192,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
+            // 如果 一级缓存(singletonObjects)中不包含此beanName,才会
+            //     因为在一级缓存(singletonObjects)中的所有bean,已经经过了完整的spring声明周期,已经是一个完整的spring bean了.
 			if (!this.singletonObjects.containsKey(beanName)) {
-				this.singletonFactories.put(beanName, singletonFactory);
+				this.singletonFactories.put(beanName, singletonFactory);//
 				this.earlySingletonObjects.remove(beanName);
 				this.registeredSingletons.add(beanName);
 			}
@@ -406,12 +409,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * Callback before singleton creation.
+     * 单例bean创建之前被调用
 	 * <p>The default implementation register the singleton as currently in creation.
 	 *
 	 * @param beanName the name of the singleton about to be created
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
+        // 此方法是在创建bean之前被调用的,如果beanName已经存在于singletonsCurrentlyInCreation,则说明:这个bean目前是inCreation状态,
+        //  此时就需要报错,可能是因为[框架层面无法解决的循环依赖]造成的.比如原型模式/构造器方式的循环依赖.
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}

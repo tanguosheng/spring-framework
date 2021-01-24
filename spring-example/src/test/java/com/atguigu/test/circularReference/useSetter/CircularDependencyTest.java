@@ -7,6 +7,7 @@ import com.atguigu.circularReference.useSetter.CircularReferenceConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -33,6 +34,10 @@ public class CircularDependencyTest {
         System.out.println(a.circB);
         System.out.println(b.circA);
 
+
+        // fixme:这里为什么没有赋值成功呢?
+        Assert.assertNotNull(a.circB);
+        Assert.assertNotNull(b.circA);
 
 
 

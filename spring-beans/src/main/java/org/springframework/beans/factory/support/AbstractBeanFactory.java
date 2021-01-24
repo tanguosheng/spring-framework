@@ -269,7 +269,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param requiredType  the required type of the bean to retrieve
 	 * @param args          arguments to use when creating a bean instance using explicit arguments
 	 *                      (only applied when creating a new instance as opposed to retrieving an existing one)
-	 * @param typeCheckOnly 当前这个bean实例的获取,是否仅仅为了此bean的类型检查,而不是为了实际使用而获取此bean.
+	 * @param typeCheckOnly 调用此方法获取当前bean,是否仅为了类型检查
      *                      whether the instance is obtained for a type check,not for actual use
 	 * @return an instance of the bean
 	 * @throws BeansException if the bean could not be created
@@ -298,8 +298,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (logger.isDebugEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
 					// 打出bean还未完全初始化好的log，因为有循环引用存在，Factory没处理完就先返回了bean实例
-					logger.debug("Returning eagerly cached instance of singleton bean '" + beanName +
-							"' that is not fully initialized yet - a consequence of a circular reference");
+					logger.debug("Returning eagerly cached instance of singleton bean '" + beanName + "' that is not fully initialized yet - a consequence of a circular reference");
 				} else {
 					// log：返回了缓存的实例
 					// 程序走到这里，bean应该是初始化完成了的，只不过在getSingleton时拿到的是创建过程中缓存的bean，
@@ -345,7 +344,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					return parentBeanFactory.getBean(nameToLookup, requiredType);
 				}
 			}
-
+			// 调用此方法获取当前bean,是否仅为了类型检查
 			if (!typeCheckOnly) {
 				// 删除名为 beanName 的 mergedBeanDefinition 缓存
 				// 让bean定义重新合并，以防万一其中一些元数据在此期间发生变化。
