@@ -10,6 +10,9 @@ dependencies {
 	optional("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	optional("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
 	testCompile("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}")
+
+
+    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.75'
 }
 
 // This module does joint compilation for Java and Groovy code with the compileGroovy task.

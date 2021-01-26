@@ -156,38 +156,102 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean lazyInit = false;
 
+    /**
+     * 自动装配模式,对应bean属性autowire
+     */
 	private int autowireMode = AUTOWIRE_NO;
 
+    /**
+     * 依赖检查 spring 3.0后弃用这个属性
+     */
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
+    /**
+     * 表示当前bean的实例化依赖其他bean先实例化
+     * 对应bean属性depend-on
+     */
 	@Nullable
 	private String[] dependsOn;
 
+    /**
+     * 当设置为false时,容器在查找自动装配对象时,将不考虑该bean,
+     * 即当前bean不会被考虑作为其他bean自动装配的候选者,
+     * 但是该bean本身还是可以使用自动装配来注入其他bean的.
+     */
 	private boolean autowireCandidate = true;
 
-	private boolean primary = false;
+    /**
+     * 自动装配时当出现多个bean候选者时,此bean将作为首选者
+     */
+    private boolean primary = false;
 
+    /**
+     * <pre>
+     * 用于记录 {@link org.springframework.beans.factory.annotation.Qualifier} 信息
+     *
+     * 注解方式:{@code
+     *               @Autowired
+     *               @Qualifier("testing")
+     *               private FooDao fooDao;
+     * }
+     * xml配置:{@code
+     *               <bean id="tb1" name="testBean1" class="org.springframework.tests.sample.beans.TestBean">
+     *                  <qualifier value="myBean"/>
+     *               </bean>
+     * }
+     * </pre>
+     */
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
+    /**
+     * 允许访问非公开的构造器和方法
+     * 程序设置
+     */
 	private boolean nonPublicAccessAllowed = true;
 
+    /**
+     * <pre>
+     * 是否以一种宽松的模式解析构造函数,默认为true
+     * 如果为false,则在下面情况会抛出异常:因为spring无法准确定位使用哪个构造函数
+     * interface ITest{}
+     * class ITestImpl implements ITest{};
+     * class Main{
+     *     Main(ITest t){}
+     *     Main(ITestImpl t){}
+     * }
+     *
+     * 程序设置
+     * </pre>
+     */
 	private boolean lenientConstructorResolution = true;
 
 	@Nullable
 	private String factoryBeanName;
 
+    /**
+     * 对应bean属性 factory-method
+     */
 	@Nullable
 	private String factoryMethodName;
 
+    /**
+     * 记录构造函数注入属性,对应bean属性 constructor-arg
+     */
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
+    /**
+     * 普通属性集合
+     */
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
+    /**
+     * 方法重写的持有者,记录lookup-method 、 replaced-method元素
+     */
 	@Nullable
 	private MethodOverrides methodOverrides;
 
@@ -197,17 +261,36 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String destroyMethodName;
 
+    /**
+     * 是否执行 init-method 方法,程序设置
+     */
 	private boolean enforceInitMethod = true;
 
+    /**
+     * 是否执行 destroy-method 方法,程序设置
+     */
 	private boolean enforceDestroyMethod = true;
 
+    /**
+     * 是否是用户定义的,而不是应用程序本身定义的,创建AOP的时候为true
+     * 程序设置
+     */
 	private boolean synthetic = false;
 
+    /**
+     * 定义这个bean的应用
+     * {@link BeanDefinition#ROLE_APPLICATION} 用户
+     * {@link BeanDefinition#ROLE_INFRASTRUCTURE} 完全内部使用,与用户无关
+     * {@link BeanDefinition#ROLE_SUPPORT} 某些复杂配置的一部分
+     */
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
 	@Nullable
 	private String description;
 
+    /**
+     * 这个bean定义是从哪个资源加载到内存中的.
+     */
 	@Nullable
 	private Resource resource;
 

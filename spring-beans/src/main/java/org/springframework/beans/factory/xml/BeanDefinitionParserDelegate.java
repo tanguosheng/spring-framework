@@ -872,6 +872,7 @@ public class BeanDefinitionParserDelegate {
 			PropertyValue pv = new PropertyValue(propertyName, val);
 			parseMetaElements(ele, pv);
 			pv.setSource(extractSource(ele));
+            // 把解析出来的属性和属性值保存到bean定义中.
 			bd.getPropertyValues().addPropertyValue(pv);
 		}
 		finally {

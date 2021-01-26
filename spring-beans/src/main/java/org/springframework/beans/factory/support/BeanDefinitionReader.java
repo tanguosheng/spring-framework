@@ -84,8 +84,15 @@ public interface BeanDefinitionReader {
 
 	/**
 	 * Load bean definitions from the specified resource.
+     * 加载bean定义 使用指定的资源
+     *
+     * 【模板模式】{@link AbstractBeanDefinitionReader}中,没有实现此方法,交给子类实现,从而达到使用不同的资源文件加载bean定义.
+     * 定义:在 模板模式（Template Pattern）中，一个抽象类公开定义了执行它的方法的方式/模板。
+     *      它的子类可以按需要重写方法实现，但调用将以抽象类中定义的方式进行。
+     *      这种类型的设计模式属于行为型模式。
+     *
 	 * @param resource the resource descriptor
-	 * @return the number of bean definitions found
+	 * @return the number of bean definitions found 返回找到的bean定义数量
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
 	int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException;

@@ -196,13 +196,14 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						// 直接解析
 						parseDefaultElement(ele, delegate);
 					} else {
-						// 默认标签中也可能包含自定义标签，委托去找到用户实现的解析器进行解析
+						// spring默认标签中也可能包含自定义标签，委托去找到用户实现的解析器进行解析
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		} else {
 			// 非默认命名空间，自定义标签，委托去找到用户实现的解析器进行解析
+            // <dubbo:service interface="com.newbanker.pdc.service.ExReservationService" ref="exReservationServiceImpl" version="1.0"/>
 			delegate.parseCustomElement(root);
 		}
 	}
@@ -219,6 +220,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
 			// recurse
+            // 递归:spring默认标签中包含了<beans>标签,则递归解析.
 			doRegisterBeanDefinitions(ele);
 		}
 	}
