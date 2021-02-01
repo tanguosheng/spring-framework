@@ -1500,7 +1500,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					if (bp instanceof InstantiationAwareBeanPostProcessor) {
 						InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 						// 对所有需要依赖检查的属性进行后处理
-
+                        pvs = ibp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
 						if (pvs == null) {
 							return;
 						}
