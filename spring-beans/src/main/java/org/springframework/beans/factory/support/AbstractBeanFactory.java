@@ -386,7 +386,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// 创建一个 ObjectFactory 隐藏实际创建 bean 的细节
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
-							return createBean(beanName, mbd, args);
+							return this.createBean(beanName, mbd, args);
 						} catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there
 							// eagerly by the creation process, to allow for circular reference resolution.

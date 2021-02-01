@@ -82,14 +82,15 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);
 		basePackage = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(basePackage);
-		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage,
-				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 
 		// Actually scan for bean definitions and register them.
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
-		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
-		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 
+        // 扫描 basePackages
+		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
+
+		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 		return null;
 	}
 
@@ -100,6 +101,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 
 		// Delegate bean definition registration to scanner class.
+        // 委托模式(Delegate) : 创建 classPath Bean定义扫描器.用于扫描 base-package 下的所有bean
 		ClassPathBeanDefinitionScanner scanner = createScanner(parserContext.getReaderContext(), useDefaultFilters);
 		scanner.setBeanDefinitionDefaults(parserContext.getDelegate().getBeanDefinitionDefaults());
 		scanner.setAutowireCandidatePatterns(parserContext.getDelegate().getAutowireCandidatePatterns());

@@ -322,7 +322,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					// 移除三级缓存(singletonFactories): 					this.singletonFactories.remove(beanName);
 					// 移除二级缓存(earlySingletonObjects): 					this.earlySingletonObjects.remove(beanName);
 					// 记录已经注册到容器中bean的名字: 	this.registeredSingletons.add(beanName);
-					addSingleton(beanName, singletonObject);
+					addSingleton(beanName, singletonObject); // spring bean
 				}
 			}
 			return singletonObject;

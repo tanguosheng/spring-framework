@@ -58,6 +58,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -469,6 +470,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * populates the bean instance, applies post-processors, etc.
 	 *
 	 * @see #doCreateBean
+     * @return 返回的这个Object类型的对象实例,还没有放到spring单例池中,所以还不能算是spring bean.应该是java对象.
 	 */
 	@Override
 	protected Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
@@ -561,8 +563,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 这里返回的是一个装着 bean 实例的 BeanWrapper
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
-		// 拿到bean的真正实例
-		final Object bean = instanceWrapper.getWrappedInstance();
+        /**
+         * rawBeanInstance为:刚new出来的对象实例:(可以理解为:各种 @Autowired 的变量还没有注入的java实例对象.)
+         *     此时这个java对象还没有完整经过spring创建bean的整个过程,所以还不能称为spring bean;
+         *     可以理解为bean的实例,也就这个对象经过完整createBean过程之后,放到单例池中(DefaultSingletonBeanRegistry#addSingleton方法),就可以称为一个spring bean了.
+         */
+		final Object rawBeanInstance = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
 		if (beanType != NullBean.class) {
 			mbd.resolvedTargetType = beanType;
@@ -621,12 +627,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 这里把bean实例用ObjectFactory包装了一下,工厂中调用getEarlyBeanReference方法提供返回bean代理实例的能力
 			// 然后删除二级缓存(earlySingletonObjects)、加入三级缓存(singletonFactories)
 			// 其实就是加入三级缓存(singletonFactories)
-			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+            addSingletonFactory(beanName, new ObjectFactory<Object>() {
+                @Override
+                public Object getObject() throws BeansException {// 这里改成内部类更容易理解:这里add的是一个 ObjectFactory
+                    return getEarlyBeanReference(beanName, mbd, rawBeanInstance); // 当 ObjectFactory#getObject() 方法被调用的时候,会返回一个早期对象 rawBeanInstance.
+                }
+            });
 		}
 
 		// Initialize the bean instance.
 		// 初始化bean实例。
-		Object exposedObject = bean;
+		Object exposedObject = rawBeanInstance;
 		try {
 			// 对bean进行填充，将各个属性值注入，
 			// 其中，可能存在依赖于其他bean的属性，则会递归初始依赖bean
@@ -660,7 +671,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 			if (earlySingletonReference != null) {
 				// 如果 exposedObject 没有在初始化方法中被改变
-				if (exposedObject == bean) {
+				if (exposedObject == rawBeanInstance) {
 					exposedObject = earlySingletonReference;
 				} else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
 					String[] dependentBeans = getDependentBeans(beanName);
@@ -697,7 +708,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Register bean as disposable.
 		try {
 			// 注册DisposableBean接口，在工厂关闭时调用的给定destroy方法。
-			registerDisposableBeanIfNecessary(beanName, bean, mbd);
+			registerDisposableBeanIfNecessary(beanName, rawBeanInstance, mbd);
 		} catch (BeanDefinitionValidationException ex) {
 			throw new BeanCreationException(
 					mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
@@ -975,11 +986,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 *
 	 * @param beanName the name of the bean (for error handling purposes)
 	 * @param mbd      the merged bean definition for the bean
-	 * @param bean     the raw bean instance
+	 * @param rawBeanInstance     the raw bean instance 原始的bean对象实例:指各种属性还没有自动注入的一个java对象实例.
 	 * @return the object to expose as bean reference
 	 */
-	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
-		Object exposedObject = bean;
+	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object rawBeanInstance) {
+		Object exposedObject = rawBeanInstance;
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {

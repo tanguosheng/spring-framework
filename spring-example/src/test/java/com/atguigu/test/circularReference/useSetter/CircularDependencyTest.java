@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.jmx.export.annotation.AnnotationTestBeanFactory;
 
 /**
  * @author LiuXianfa
