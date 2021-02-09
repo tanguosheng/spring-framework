@@ -12,14 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CircularDependencyB {
 
-//    @Autowired
-    public CircularDependencyA circA;
-
-    @Value("aa")
-    private String aa;
-
     @Autowired
-    public void setCircA(CircularDependencyA circA) {
-        this.circA = circA;
-    }
+    public CircularDependencyA circA;
 }

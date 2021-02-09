@@ -1468,7 +1468,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
-		// 如果该bean是支持按照名字或者类型自动注入的，
+		// 如果该bean是支持按照名字或者类型自动注入的(注意:@Autowired注入不是走的这个逻辑,而是在下面使用的 AutowiredAnnotationBeanPostProcessor 后处理器来自动注入的.)
 		if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME || mbd.getResolvedAutowireMode() == AUTOWIRE_BY_TYPE) {
 			// 深度拷贝PropertyValues，当然对于对象来说只能公用一个
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
@@ -1500,6 +1500,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					if (bp instanceof InstantiationAwareBeanPostProcessor) {
 						InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 						// 对所有需要依赖检查的属性进行后处理
+                        // @Autowired注入,使用的 AutowiredAnnotationBeanPostProcessor 后处理器来自动注入的.
                         pvs = ibp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
 						if (pvs == null) {
 							return;
