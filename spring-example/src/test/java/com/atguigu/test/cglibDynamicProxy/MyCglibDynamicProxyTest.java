@@ -24,7 +24,23 @@ import java.lang.reflect.Method;
  * 4、性能:
  *      据说和jdk8的动态代理对比,性能方面已经差不多了.
  * 5、视频地址:https://www.bilibili.com/video/BV1SJ411v7fq
- * 6、
+ * 6、执行此代码之后,会在[项目根目录 + /com/atguigu/test/cglibDynamicProxy/] 目录下生成代理类class文件.
+ * 7、从动态生成的代理类class文件可见,代理方法实现为:
+ * {@code
+ *     public final void login(String var1, String var2) {
+ *         MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
+ *         if (var10000 == null) {
+ *             CGLIB$BIND_CALLBACKS(this);
+ *             var10000 = this.CGLIB$CALLBACK_0;
+ *         }
+ *
+ *         if (var10000 != null) {     // 如果能获取到 MethodInterceptor ,就调用其拦截方法.(拦截方法中定义了前后置等增强处理.)
+ *             var10000.intercept(this, CGLIB$login$0$Method, new Object[]{var1, var2}, CGLIB$login$0$Proxy);
+ *         } else {                    // 否则就直接调用目标方法(即父类中的方法).
+ *             super.login(var1, var2);
+ *         }
+ *     }
+ * }
  * </pre>
  *
  * @author LiuXianfa
