@@ -91,6 +91,14 @@ import java.lang.reflect.Proxy;
  *     }
  * }
  * }
+ * 4、为什么jdk动态代理,必须实现接口?   阿里P7
+ *    答:JAVA语法要求[类是单继承、多实现].
+ *       从上面第三条看到:代理的对象的类已经继承了java.lang.reflect.Proxy类,所以只能要求[被代理类target]实现接口.
+ * 5、jdk动态代理的优点:
+ *     依赖jdk本身的api.无需引入其他jar包.
+ * 6、jdk动态代理的缺点:
+ *    必须要求需要代理的类实现自接口.对代码有侵入性.
+ *    性能方面,经过jdk8优化后,已经和cglib差不多了.
  * </pre>
  *
  * @author LiuXianfa
@@ -100,6 +108,10 @@ import java.lang.reflect.Proxy;
 public class JdkDynamicProxyTest {
 
     public static void main(String[] args) throws IOException {
+        // 把jdk动态代理生成的代理类class文件,写到 [当前项目跟目录+包名] 目录里.
+        // 详见:sun.misc.ProxyGenerator#saveGeneratedFiles
+        System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+
         // 被代理的原始对象,也可以成为目标对象
         LoginServiceImpl target = new LoginServiceImpl();
         LoginService proxy = getProxy(target);
@@ -153,6 +165,9 @@ public class JdkDynamicProxyTest {
 
     /**
      * 生成代理对象的class文件.
+     *
+     * 使用 {@code System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true"); } 也可以把生成的class文件输出出来.
+     * 输出的class文件在 [当前项目跟目录+包名] 目录里.
      *
      * @param target
      * @throws IOException
