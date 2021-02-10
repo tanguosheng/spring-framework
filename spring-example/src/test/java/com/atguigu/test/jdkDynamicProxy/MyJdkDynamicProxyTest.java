@@ -20,7 +20,7 @@ import java.lang.reflect.Proxy;
  *      备注:直接使用 target.getClass().getInterfaces() 就行
  *    3)实现InvocationHandler的invoke方法.
  * 2、调用proxy代理对象的任何方法都会被增强;直接调用target目标对象的任何方法,都不会被增强.
- * 3、生产的代理对象class:
+ * 3、动态生成的代理类class文件: 在[项目根目录+包名]文件夹中.(执行一次main方法,才会生成)(目前不知道如何修改成其他目录.)
  *      备注:在生成的代理对象class文件中可以看到,代理对象内部所有方法都会去调用 {@link InvocationHandler#invoke} 方法.
  * {@code
  * import com.atguigu.test.jdkProxy.LoginService;
@@ -61,7 +61,7 @@ import java.lang.reflect.Proxy;
  *
  *     public final void login(String var1, String var2) throws  {
  *         try {
- *             super.h.invoke(this, m3, new Object[]{var1, var2});
+ *             super.h.invoke(this, m3, new Object[]{var1, var2});   // 动态生成的代理类中的代理方法,会直接调用{@link InvocationHandler#invoke}方法.
  *         } catch (RuntimeException | Error var4) {
  *             throw var4;
  *         } catch (Throwable var5) {
