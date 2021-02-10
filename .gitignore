@@ -38,3 +38,9 @@ out
 test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache
+
+
+# jdk动态代理和cglib会把生产的代理类class文件输出到这些目录中.
+# 详见测试类: MyCglibDynamicProxyTest   MyJdkDynamicProxyTest
+com
+org
