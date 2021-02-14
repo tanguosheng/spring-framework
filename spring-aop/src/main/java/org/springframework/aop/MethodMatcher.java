@@ -21,7 +21,10 @@ import java.lang.reflect.Method;
 import org.springframework.lang.Nullable;
 
 /**
- * Part of a {@link Pointcut}: Checks whether the target method is eligible for advice.
+ *
+ * 根据{@link Pointcut}:检查目标方法是否需要增强
+ *
+ * Part of a {@link Pointcut}: Checks whether the target method is eligible for advice().
  *
  * <p>A MethodMatcher may be evaluated <b>statically</b> or at <b>runtime</b> (dynamically).
  * Static matching involves method and (possibly) method attributes. Dynamic matching

@@ -336,13 +336,15 @@ public abstract class DataSourceUtils {
 			return;
 		}
 		if (dataSource != null) {
-			ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
+			ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource); // 从ThreadLocal中获取数据库连接.
 			if (conHolder != null && connectionEquals(conHolder, con)) {
 				// It's the transactional Connection: Don't close it.
+                // 这是个事务连接:不调用close()方法关闭.而是使用released()方法进行连接数减一
 				conHolder.released();
 				return;
 			}
 		}
+        // 调用close()方法关闭连接
 		doCloseConnection(con, dataSource);
 	}
 

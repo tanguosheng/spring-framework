@@ -38,6 +38,11 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public interface TransactionAnnotationParser {
 
 	/**
+     * 通过给定的方法或类,解析事务注解,返回事务属性.
+     * 如果方法或类没有事务注解,则返回null.
+     *
+     * 有三个实现类,分别对应不同的事务注解.
+     *
 	 * Parse the transaction attribute for the given method or class,
 	 * based on an annotation type understood by this parser.
 	 * <p>This essentially parses a known transaction annotation into Spring's metadata

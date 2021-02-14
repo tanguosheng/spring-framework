@@ -31,6 +31,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ *
+ * 基于注解的事务属性资源存储器
+ *
+ *
+ * 内置注解事务解析器: {@link this#annotationParsers}
+ * 当需要给定方法或给定类的事务属性时,会使用事务属性解析器去解析事务注解,把注解相关配置信息,封装成 {@link TransactionAttribute}
+ *
+ *
+ * 支持三种事务注解: {@link Transactional} {@link javax.transaction.Transactional} {@link javax.ejb.TransactionAttribute}
+ * 也分别对应三个事务注解解析器:详见{@link TransactionAnnotationParser}三个子类
+ *
  * Implementation of the
  * {@link org.springframework.transaction.interceptor.TransactionAttributeSource}
  * interface for working with transaction metadata in JDK 1.5+ annotation format.
@@ -53,8 +64,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.transaction.interceptor.TransactionProxyFactoryBean#setTransactionAttributeSource
  */
 @SuppressWarnings("serial")
-public class AnnotationTransactionAttributeSource extends AbstractFallbackTransactionAttributeSource
-		implements Serializable {
+public class AnnotationTransactionAttributeSource extends AbstractFallbackTransactionAttributeSource implements Serializable {
 
 	private static final boolean jta12Present = ClassUtils.isPresent(
 			"javax.transaction.Transactional", AnnotationTransactionAttributeSource.class.getClassLoader());
@@ -62,6 +72,10 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	private static final boolean ejb3Present = ClassUtils.isPresent(
 			"javax.ejb.TransactionAttribute", AnnotationTransactionAttributeSource.class.getClassLoader());
 
+    /**
+     * 是否只对public方法进行事务控制
+     * 默认为true
+     */
 	private final boolean publicMethodsOnly;
 
 	private final Set<TransactionAnnotationParser> annotationParsers;

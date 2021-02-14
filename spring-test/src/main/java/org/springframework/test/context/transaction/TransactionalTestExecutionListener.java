@@ -134,6 +134,7 @@ public class TransactionalTestExecutionListener extends AbstractTestExecutionLis
 	private static final Log logger = LogFactory.getLog(TransactionalTestExecutionListener.class);
 
 	// Do not require @Transactional test methods to be public.
+    // 事务属性资源:参数publicMethodsOnly=false表示:可以对非public方法启用事务.
 	protected final TransactionAttributeSource attributeSource = new AnnotationTransactionAttributeSource(false);
 
 

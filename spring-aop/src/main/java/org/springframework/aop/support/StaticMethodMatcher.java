@@ -25,6 +25,9 @@ import org.springframework.lang.Nullable;
  * Convenient abstract superclass for static method matchers, which don't care
  * about arguments at runtime.
  *
+ * 判断静态方法是否需要增强.
+ * 所以对于存在targetClass参数的方法,肯定是不支持的.因为静态方法,都是使用类名调用的
+ *
  * @author Rod Johnson
  */
 public abstract class StaticMethodMatcher implements MethodMatcher {

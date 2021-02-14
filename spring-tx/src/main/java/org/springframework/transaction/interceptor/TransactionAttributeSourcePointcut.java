@@ -39,7 +39,11 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 			return false;
 		}
 		TransactionAttributeSource tas = getTransactionAttributeSource();
+        // 从目标类和方法上获取事务属性.(其实还包括接口类、接口方法)
+        // 判断逻辑:如果方法或目标类上存在事务注解,则返回true:表示此方法需要aop增强.
 		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
+        // 其实从这里可以看到[事务是基于aop实现的]:
+        //  如果目标类、目标方法上存在事务注解,则aop的方法matches匹配成功,则此方法会被aop增强.
 	}
 
 	@Override

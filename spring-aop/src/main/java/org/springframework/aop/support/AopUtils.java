@@ -176,6 +176,9 @@ public abstract class AopUtils {
 	}
 
 	/**
+     * 给定的方法可能来自一个接口,从targetClass中找重写的方法.
+     * 如果没有重写或者targetClass为null,就返回原方法.
+     *
 	 * Given a method, which may come from an interface, and a target class used
 	 * in the current AOP invocation, find the corresponding target method if there
 	 * is one. E.g. the method may be {@code IFoo.bar()} and the target class
@@ -301,7 +304,7 @@ public abstract class AopUtils {
 	/**
 	 * Determine the sublist of the {@code candidateAdvisors} list
 	 * that is applicable to the given class.
-	 * @param candidateAdvisors the Advisors to evaluate
+	 * @param candidateAdvisors 候选增强器.还需要评估是否能对目标类进行增强.the Advisors to evaluate
 	 * @param clazz the target class
 	 * @return sublist of Advisors that can apply to an object of the given class
 	 * (may be the incoming List as-is)
@@ -310,6 +313,7 @@ public abstract class AopUtils {
 		if (candidateAdvisors.isEmpty()) {
 			return candidateAdvisors;
 		}
+        // 合格的增强器list
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
 		for (Advisor candidate : candidateAdvisors) {
 
@@ -322,11 +326,11 @@ public abstract class AopUtils {
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 		for (Advisor candidate : candidateAdvisors) {
 			if (candidate instanceof IntroductionAdvisor) {
-				// already processed
+				// 这种增强器上面已经处理过了
 				continue;
 			}
 
-			// 走这里
+			// 判断当候选增强器,是否能够对此类进行增强.
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}

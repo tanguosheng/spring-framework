@@ -132,27 +132,29 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 	 * that each instance may register and configure servlets such as Spring's
 	 * {@code DispatcherServlet}, listeners such as Spring's {@code ContextLoaderListener},
 	 * or any other Servlet API componentry such as filters.
-	 * @param webAppInitializerClasses all implementations of
-	 * {@link WebApplicationInitializer} found on the application classpath
-	 * @param servletContext the servlet context to be initialized
+     *
+	 * @param webAppInitializerClasses 在classpath中找到的所有{@link WebApplicationInitializer}接口的子类、抽象类、子接口集合
+     *                                    all implementations of {@link WebApplicationInitializer} found on the application classpath
+     *
+	 * @param servletContext servlet上线文;可以向其add监听器、过滤器、servlet等;在tomcat中,每个应用程序对应一个 {@link ServletContext} 对象实例.
+     *                          the servlet context to be initialized
+     *
 	 * @see WebApplicationInitializer#onStartup(ServletContext)
 	 * @see AnnotationAwareOrderComparator
 	 */
 	@Override
-	public void onStartup(@Nullable Set<Class<?>> webAppInitializerClasses, ServletContext servletContext)
-			throws ServletException {
+	public void onStartup(@Nullable Set<Class<?>> webAppInitializerClasses, ServletContext servletContext) throws ServletException {
 
 		List<WebApplicationInitializer> initializers = new LinkedList<>();
 
 		if (webAppInitializerClasses != null) {
-			for (Class<?> waiClass : webAppInitializerClasses) {
-				// Be defensive: Some servlet containers provide us with invalid classes,
-				// no matter what @HandlesTypes says...
-				if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
-						WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
+			for (Class<?> clazz : webAppInitializerClasses) {
+                // 1、如果class是WebApplicationInitializer的子类 (不是子接口 && 不是抽象类)
+				if (WebApplicationInitializer.class.isAssignableFrom(clazz) && !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())) {
 					try {
-						initializers.add((WebApplicationInitializer)
-								ReflectionUtils.accessibleConstructor(waiClass).newInstance());
+					    // 2、就通过构造方法反射new一个实例,然后add到initializers List中.
+                        WebApplicationInitializer initializer = (WebApplicationInitializer) ReflectionUtils.accessibleConstructor(clazz).newInstance();
+                        initializers.add(initializer);
 					}
 					catch (Throwable ex) {
 						throw new ServletException("Failed to instantiate WebApplicationInitializer class", ex);
@@ -161,13 +163,17 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 			}
 		}
 
+        // 3、如果list是空的:打印日志.并结束servlet容器.
 		if (initializers.isEmpty()) {
 			servletContext.log("No Spring WebApplicationInitializer types detected on classpath");
 			return;
 		}
 
 		servletContext.log(initializers.size() + " Spring WebApplicationInitializers detected on classpath");
+
+		// 4、list不为空:基于spring规则排序
 		AnnotationAwareOrderComparator.sort(initializers);
+		// 5、依次调用 web应用初始化器的 onStartup()方法
 		for (WebApplicationInitializer initializer : initializers) {
 			initializer.onStartup(servletContext);
 		}

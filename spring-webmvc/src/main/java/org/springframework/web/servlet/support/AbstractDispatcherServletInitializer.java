@@ -59,9 +59,15 @@ public abstract class AbstractDispatcherServletInitializer extends AbstractConte
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
+        // 1、首先调用super方法:[重要]super方法中会注册一个[上线文加载监听器].
 		super.onStartup(servletContext);
+
+        // 2、注册用于派发http请求的servlet
 		registerDispatcherServlet(servletContext);
-	}
+
+        // @see org.springframework.web.servlet.DispatcherServlet
+        //       DispatcherServlet作用:servlet容器接收到的所有http请求,都是此servlet把请求根据@RequestMapping派发到Controller方法的
+    }
 
 	/**
 	 * Register a {@link DispatcherServlet} against the given servlet context.
@@ -78,23 +84,29 @@ public abstract class AbstractDispatcherServletInitializer extends AbstractConte
 		String servletName = getServletName();
 		Assert.hasLength(servletName, "getServletName() must not return null or empty");
 
+        // 1、模板方法:创建ioc容器
 		WebApplicationContext servletAppContext = createServletApplicationContext();
 		Assert.notNull(servletAppContext, "createServletApplicationContext() must not return null");
 
+        // 2、创建 org.springframework.web.servlet.DispatcherServlet
 		FrameworkServlet dispatcherServlet = createDispatcherServlet(servletAppContext);
 		Assert.notNull(dispatcherServlet, "createDispatcherServlet(WebApplicationContext) must not return null");
+        // 3、设置ApplicationContextInitializer todo:???在哪里被调用的?
 		dispatcherServlet.setContextInitializers(getServletApplicationContextInitializers());
 
+        // 4、[servlet] 把DispatcherServlet注册到servlet容器中.
 		ServletRegistration.Dynamic registration = servletContext.addServlet(servletName, dispatcherServlet);
 		if (registration == null) {
 			throw new IllegalStateException("Failed to register servlet with name '" + servletName + "'. " +
 					"Check if there is another servlet registered under the same name.");
 		}
 
-		registration.setLoadOnStartup(1);
-		registration.addMapping(getServletMappings());
-		registration.setAsyncSupported(isAsyncSupported());
+        // 5、对此servlet进行配置:
+        registration.addMapping(getServletMappings());// 指定servlet处理的http请求uri.
+        registration.setLoadOnStartup(1); // 加载顺序
+		registration.setAsyncSupported(isAsyncSupported()); // 是否异步支持
 
+        // 6、获取servlet过滤器并注册到servlet容器中.
 		Filter[] filters = getServletFilters();
 		if (!ObjectUtils.isEmpty(filters)) {
 			for (Filter filter : filters) {
@@ -102,6 +114,7 @@ public abstract class AbstractDispatcherServletInitializer extends AbstractConte
 			}
 		}
 
+        // 7、子类实现:自定义注册
 		customizeRegistration(registration);
 	}
 

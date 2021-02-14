@@ -127,6 +127,7 @@ public abstract class ConnectionFactoryUtils {
 		logger.debug("Opening CCI Connection");
 		Connection con = cf.getConnection();
 
+        // 当前线程支持同步
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			conHolder = new ConnectionHolder(con);
 			conHolder.setSynchronizedWithTransaction(true);
