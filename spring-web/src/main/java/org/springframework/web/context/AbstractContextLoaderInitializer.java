@@ -78,6 +78,12 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 	}
 
 	/**
+     * 创建要提供给ContextLoaderListener的“根”应用程序上下文。
+     * 返回的上下文委派给{@link ContextLoaderListener#ContextLoaderListener(WebApplicationContext)} ，
+     * 并将其建立为任何DispatcherServlet应用程序上下文的"父"上下文。 因此，它通常包含中间层服务，数据源等。
+     *
+     * 图示:<a href="https://docs.spring.io/spring-framework/docs/current/reference/html/images/mvc-context-hierarchy.png">图示</a>
+     *
 	 * Create the "<strong>root</strong>" application context to be provided to the
 	 * {@code ContextLoaderListener}.
 	 * <p>The returned context is delegated to

@@ -128,6 +128,24 @@ public abstract class AbstractDispatcherServletInitializer extends AbstractConte
 	}
 
 	/**
+     * <pre>
+     * 创建要提供给DispatcherServlet的Servlet应用程序上下文。
+     * 返回的上下文委托给Spring的{@link DispatcherServlet#DispatcherServlet(WebApplicationContext)} 。
+     * 因此，它通常包含控制器，视图解析器，语言环境解析器和其他与`Web相关的bean`。(而需要在多个servlet共享的bean都放到根ioc容器中,比如与数据源相关的bean、业务bean等)
+     *
+     *
+     * 文档地址: <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-servlet-context-hierarchy">文档地址</a>
+     * 注释:对于许多应用程序而言，拥有一个WebApplicationContext简单且足够。
+     *      但是spring也支持具有父子结构的ioc容器.
+     *      其中 根WebApplicationContext在多个DispatcherServlet（或其他Servlet）实例之间共享;而每个servlet实例都有其自己的子WebApplicationContext.
+     *
+     *      根WebApplicationContext通常包含基础结构bean. (例如需要在多个Servlet实例之间共享的数据存储库和业务服务。)
+     *      这些需要被共享的Bean被有效地继承(因为子容器中getBean获取不到,就会委派给父容器).
+     *      并且可以在Servlet特定的子级中重写（即重新声明），该子级WebApplicationContext通常包含本地的Bean Servlet。(比如controller、view、HandlerMapping等)
+     *
+     * 图示:<a href="https://docs.spring.io/spring-framework/docs/current/reference/html/images/mvc-context-hierarchy.png">图示</a>
+     * </pre>
+     *
 	 * Create a servlet application context to be provided to the {@code DispatcherServlet}.
 	 * <p>The returned context is delegated to Spring's
 	 * {@link DispatcherServlet#DispatcherServlet(WebApplicationContext)}. As such,
