@@ -182,7 +182,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 	/**
 	 * Detects handler methods at initialization.
-	 * @see #initHandlerMethods
+     *
+     * 在当前bean的属性都set完毕后,调用业务逻辑初始化方法.
+     *
+     * todo:疑问:当前bean初始化完毕后的时候,调用afterPropertiesSet()方法时,就说明所有的controller都已经在ioc容器中了?
+     *  如果说当前bean初始化完毕时,ioc容器中还没有把所有的controller都初始化完毕,那这不就有问题了?
+     *  所以问题来了:spring是如何保证加载顺序的?
+     *  探索:在new这个对象时,都会调用 setOrder(0) 设置order = 0.    这order=0有什么特殊的地方吗?    深入探索结果:不是通过order=0来实现的.
+     *  而是使用 {@link org.springframework.web.servlet.FrameworkServlet.ContextRefreshListener} 这个'上线文加载完毕监听器'来实现的.
 	 */
 	@Override
 	public void afterPropertiesSet() {
@@ -191,6 +198,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 	/**
 	 * Scan beans in the ApplicationContext, detect and register handler methods.
+     *
+     * 初始化:
+     * 从ioc容器中探测所有的bean,解析出方法处理器并注册      ('注册'的意思,其实就是找个地方保存起来.用的时候能从这个地方获取到.{@link MappingRegistry}).
+     *
 	 * @see #isHandler
 	 * @see #detectHandlerMethods
 	 * @see #handlerMethodsInitialized
@@ -296,7 +307,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 	/**
 	 * Invoked after all handler methods have been detected.
-	 * @param handlerMethods a read-only map with handler methods and mappings.
+     * 模板方法:留给子类实现:在所有方法处理器都已经被探测完毕之后被调用.
+	 * @param handlerMethods 解析出的方法处理映射map(只读map)
+     *                          a read-only map with handler methods and mappings.
 	 */
 	protected void handlerMethodsInitialized(Map<T, HandlerMethod> handlerMethods) {
 	}
@@ -309,12 +322,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+        // 获取request对应的查找路径.(也可认为是:当前request对应的key值,根据key可以找到对应的解析器.)
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking up handler method for path " + lookupPath);
 		}
-		this.mappingRegistry.acquireReadLock();
+		this.mappingRegistry.acquireReadLock();// 锁
 		try {
+            // 查找当前请求的处理方法
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 			if (logger.isDebugEnabled()) {
 				if (handlerMethod != null) {
@@ -327,11 +342,13 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {
-			this.mappingRegistry.releaseReadLock();
+			this.mappingRegistry.releaseReadLock();// 释放锁
 		}
 	}
 
 	/**
+     * 查找当前请求的最佳匹配的方法处理器。如果找到多个匹配选项，则选择最佳匹配项。
+     *
 	 * Look up the best-matching handler method for the current request.
 	 * If multiple matches are found, the best match is selected.
 	 * @param lookupPath mapping lookup path within the current servlet mapping
@@ -478,6 +495,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * A registry that maintains all mappings to handler methods, exposing methods
 	 * to perform lookups and providing concurrent access.
 	 * <p>Package-private for testing purposes.
+     *
+     * 请求映射注册器
+     * 可以根据请求uri注册注册/获取对应的请求处理器
 	 */
 	class MappingRegistry {
 

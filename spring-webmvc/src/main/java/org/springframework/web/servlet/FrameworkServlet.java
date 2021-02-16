@@ -62,6 +62,7 @@ import org.springframework.web.context.support.ServletRequestHandledEvent;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;
 import org.springframework.web.util.NestedServletException;
 import org.springframework.web.util.WebUtils;
 
@@ -662,6 +663,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		wac.setServletContext(getServletContext());
 		wac.setServletConfig(getServletConfig());
 		wac.setNamespace(getNamespace());
+        // [重要] 注册了一个监听器.   这个监听器的逻辑具体看: ContextRefreshListener
 		wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
 
 		// The wac environment's #initPropertySources will be called in any case when the context
@@ -1122,6 +1124,24 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/**
 	 * ApplicationListener endpoint that receives events from this servlet's WebApplicationContext
 	 * only, delegating to {@code onApplicationEvent} on the FrameworkServlet instance.
+     *
+     * 重要!!!【ioc容器刷新完毕监听器】
+     *
+     * 此监听器关注 ioc容器刷新完毕事件ContextRefreshedEvent
+     * 通过这个监听器的方式,让spring ioc容器在刷新完毕之后,回调自定义的servlet逻辑.
+     * (说人话就是: 通过这个监听器回调方法,使得spring-webmvc和spring-context之间有了关系.能在spring-context执行完毕之后,执行一些对于spring-webmvc来说的自定义逻辑.)
+     *
+     *
+     * 这个方法,解释了 {@link AbstractHandlerMethodMapping#afterPropertiesSet()} 方法上的疑问.
+     *
+     *
+     *
+     *
+     *
+     * 这里再留一个彩蛋(问题):
+     *  我们知道,监听器需要先注册到spring容器中,才会在事件发布的时候会被调用.
+     *  那这个监听器,是在哪里(以及何时)注册到spring ioc容器中的呢?
+     *
 	 */
 	private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
 

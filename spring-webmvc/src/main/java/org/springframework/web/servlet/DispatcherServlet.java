@@ -281,6 +281,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		// by application developers.
 		try {
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
+            // 加载 DispatcherServlet 默认策略
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 		}
 		catch (IOException ex) {
@@ -961,8 +962,10 @@ public class DispatcherServlet extends FrameworkServlet {
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
+                // 为当前请求决定出对应的请求处理器.
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
+                    // 请求处理器未找到
 					noHandlerFound(processedRequest, response);
 					return;
 				}
@@ -988,6 +991,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Actually invoke the handler.
+                // 调用请求处理器   todo:疑问:对于 @ResponseBody 的请求,是如何处理的?
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {

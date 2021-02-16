@@ -22,6 +22,7 @@ include "spring-websocket"
 include "spring-framework-bom"
 // spring源码案例。可以用来debug
 include 'spring-example'
+include 'spring-webmvc-test'
 
 // Exposes gradle buildSrc for IDE support
 include "buildSrc"
