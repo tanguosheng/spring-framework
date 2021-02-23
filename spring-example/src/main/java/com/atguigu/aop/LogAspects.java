@@ -11,42 +11,42 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
 /**
- * ÇĞÃæÀà
+ * åˆ‡é¢ç±»
  * @author lfy
  * 
- * @Aspect£º ¸æËßSpringµ±Ç°ÀàÊÇÒ»¸öÇĞÃæÀà
+ * @Aspectï¼š å‘Šè¯‰Springå½“å‰ç±»æ˜¯ä¸€ä¸ªåˆ‡é¢ç±»
  *
  */
 @Aspect
 public class LogAspects {
 	
-	//³éÈ¡¹«¹²µÄÇĞÈëµã±í´ïÊ½
-	//1¡¢±¾ÀàÒıÓÃ
-	//2¡¢ÆäËûµÄÇĞÃæÒıÓÃ
+	//æŠ½å–å…¬å…±çš„åˆ‡å…¥ç‚¹è¡¨è¾¾å¼
+	//1ã€æœ¬ç±»å¼•ç”¨
+	//2ã€å…¶ä»–çš„åˆ‡é¢å¼•ç”¨
 	@Pointcut("execution(public int com.atguigu.aop.MathCalculator.*(..))")
 	public void pointCut(){};
 	
-	//@BeforeÔÚÄ¿±ê·½·¨Ö®Ç°ÇĞÈë£»ÇĞÈëµã±í´ïÊ½£¨Ö¸¶¨ÔÚÄÄ¸ö·½·¨ÇĞÈë£©
+	//@Beforeåœ¨ç›®æ ‡æ–¹æ³•ä¹‹å‰åˆ‡å…¥ï¼›åˆ‡å…¥ç‚¹è¡¨è¾¾å¼ï¼ˆæŒ‡å®šåœ¨å“ªä¸ªæ–¹æ³•åˆ‡å…¥ï¼‰
 	@Before("pointCut()")
 	public void before(JoinPoint joinPoint){
 		Object[] args = joinPoint.getArgs();
-		System.out.println(""+joinPoint.getSignature().getName()+"ÔËĞĞ¡£¡£¡£@Before:²ÎÊıÁĞ±íÊÇ£º{"+Arrays.asList(args)+"}");
+		System.out.println(""+joinPoint.getSignature().getName()+"è¿è¡Œã€‚ã€‚ã€‚@Before:å‚æ•°åˆ—è¡¨æ˜¯ï¼š{"+Arrays.asList(args)+"}");
 	}
 	
 	@After("com.atguigu.aop.LogAspects.pointCut()")
 	public void logEnd(JoinPoint joinPoint){
-		System.out.println(""+joinPoint.getSignature().getName()+"½áÊø¡£¡£¡£@After");
+		System.out.println(""+joinPoint.getSignature().getName()+"ç»“æŸã€‚ã€‚ã€‚@After");
 	}
 	
-	//JoinPointÒ»¶¨Òª³öÏÖÔÚ²ÎÊı±íµÄµÚÒ»Î»
+	//JoinPointä¸€å®šè¦å‡ºç°åœ¨å‚æ•°è¡¨çš„ç¬¬ä¸€ä½
 	@AfterReturning(value="pointCut()",returning="result")
 	public void logReturn(JoinPoint joinPoint,Object result){
-		System.out.println(""+joinPoint.getSignature().getName()+"Õı³£·µ»Ø¡£¡£¡£@AfterReturning:ÔËĞĞ½á¹û£º{"+result+"}");
+		System.out.println(""+joinPoint.getSignature().getName()+"æ­£å¸¸è¿”å›ã€‚ã€‚ã€‚@AfterReturning:è¿è¡Œç»“æœï¼š{"+result+"}");
 	}
 	
 	@AfterThrowing(value="pointCut()",throwing="exception")
 	public void logException(JoinPoint joinPoint,Exception exception){
-		System.out.println(""+joinPoint.getSignature().getName()+"Òì³£¡£¡£¡£Òì³£ĞÅÏ¢£º{"+exception+"}");
+		System.out.println(""+joinPoint.getSignature().getName()+"å¼‚å¸¸ã€‚ã€‚ã€‚å¼‚å¸¸ä¿¡æ¯ï¼š{"+exception+"}");
 	}
 
 }
