@@ -204,6 +204,10 @@ configure(allprojects) { project ->
 //	编译时，都是用统一字符集
 	compileJava.options.encoding = 'UTF-8'
 	compileTestJava.options.encoding = 'UTF-8'
+
+//  编译时,跳过文档doc打包,加快打包速度
+    tasks.withType(Javadoc) { enabled = false }
+    tasks.withType(Groovydoc) { enabled = false }
 }
 
 configure(subprojects - project(":spring-build-src")) { subproject ->
@@ -226,6 +230,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 
 //	文档和源码包打包相关
 	javadoc {
+        enabled = false // 设置停用此task,加快源码编译
 		description = "Generates project-level javadoc for use in -javadoc jar"
 		options.encoding = "UTF-8"
 		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
@@ -240,12 +245,14 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		logging.captureStandardOutput LogLevel.INFO  // suppress "## warnings" message
 	}
 	task sourcesJar(type: Jar, dependsOn: classes) {
+        enabled = false // 设置停用此task,加快源码编译
 		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 		classifier = "sources"
 		from sourceSets.main.allSource
 		// Don't include or exclude anything explicitly by default. See SPR-12085.
 	}
 	task javadocJar(type: Jar) {
+        enabled = false // 设置停用此task,加快源码编译
 		classifier = "javadoc"
 		from javadoc
 	}
@@ -254,11 +261,6 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		archives javadocJar
 	}
 //	文档和源码包打包相关 end
-
-
-//	编译时，都是用统一字符集
-	compileJava.options.encoding = 'UTF-8'
-	compileTestJava.options.encoding = 'UTF-8'
 }
 
 configure(rootProject) {

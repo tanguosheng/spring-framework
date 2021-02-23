@@ -11,6 +11,10 @@
 (idea 自带的 gradle 版本可能更新（5.0）或者更老，会有各种编译问题)
 https://services.gradle.org/distributions/gradle-4.9-bin.zip
 
+![image-20210223192846226](images/image-20210223192846226.png)
+
+
+
 配置环境变量：
 GRADLE_HOME=/Users/***/tools/gradle-4.9
 Path引入环境变量，例子如下：
@@ -25,6 +29,21 @@ jdk版本为1.8， 我的为1.8.0_161-b12，可以编译成功
 跑一下 build.gradle，等到片刻 即可... 
 
 P.s.: 此源码编译配置和官方不完全一致，有适当的增删
+
+
+
+# 【遇到问题及解决方案】
+
+## 一、IDEA Gradle项目控制台输出乱码
+
+![image-20210223193222808](images/image-20210223193222808.png)
+
+解决方案参考：https://blog.csdn.net/xiaopihair123/article/details/105161231 （记得重启idea)
+
+
+
+## 二、
+
 
 
 This is the home of the Spring Framework, the foundation for all

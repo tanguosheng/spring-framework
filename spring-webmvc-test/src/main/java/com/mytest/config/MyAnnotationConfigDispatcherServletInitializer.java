@@ -17,7 +17,7 @@ public class MyAnnotationConfigDispatcherServletInitializer extends AbstractAnno
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{RootConfig.class};
+        return new Class<?>[]{RootConfig.class}; // 这地方泛型需要写上,虽然运行时不会有问题,但是在gradle打包的时候会报错.奇葩.
     }
 
     @Override
