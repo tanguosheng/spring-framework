@@ -12,6 +12,7 @@ public class MyAnnotationConfigDispatcherServletInitializer extends AbstractAnno
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return null;
+        // return new Class[]{RootConfig.class};  // fixme:使用这配置,会报错 Caused by: java.lang.ClassNotFoundException: org.springframework.cglib.core.NamingPolicy
     }
 
     @Override

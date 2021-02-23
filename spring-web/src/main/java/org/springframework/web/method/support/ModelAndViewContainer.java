@@ -262,6 +262,9 @@ public class ModelAndViewContainer {
 
 	/**
 	 * Whether the request has been handled fully within the handler.
+     * 请求是否已在处理程序中完全处理。
+     *
+     * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter#getModelAndView
 	 */
 	public boolean isRequestHandled() {
 		return this.requestHandled;

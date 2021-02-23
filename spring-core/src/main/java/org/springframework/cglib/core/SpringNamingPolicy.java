@@ -37,3 +37,7 @@ public class SpringNamingPolicy extends DefaultNamingPolicy {
 	}
 
 }
+
+// 报错: Caused by: java.lang.ClassNotFoundException: org.springframework.cglib.core.NamingPolicy
+// 注释: 如果 DefaultNamingPolicy 这个类找不到,则在项目跟目录执行:gradle objenesisRepackJar 和 gradle cglibRepackJar
+// 参考: https://blog.csdn.net/a704397849/article/details/102760379

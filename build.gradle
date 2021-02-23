@@ -1,5 +1,8 @@
 buildscript {
 	repositories {
+        // 添加阿里云镜像
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/'}
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
 		maven { url "https://repo.spring.io/plugins-release" }
 	}
 	dependencies {
@@ -72,7 +75,7 @@ configure(allprojects) { project ->
 	apply plugin: "propdeps"
 	apply plugin: "test-source-set-dependencies"
 	apply plugin: "io.spring.dependency-management"
-	apply from: "${gradleScriptDir}/ide.gradle"
+//	apply from: "${gradleScriptDir}/ide.gradle"
 
 	dependencyManagement {
 		resolutionStrategy {

@@ -991,7 +991,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Actually invoke the handler.
-                // 调用请求处理器   todo:疑问:对于 @ResponseBody 的请求,是如何处理的?
+                // 调用请求处理器   todo:疑问:对于 @ResponseBody 的请求,返回值为null 详见: RequestMappingHandlerAdapter#getModelAndView
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {

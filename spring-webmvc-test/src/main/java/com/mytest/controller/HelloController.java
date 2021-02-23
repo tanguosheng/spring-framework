@@ -2,8 +2,12 @@ package com.mytest.controller;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author LiuXianfa
@@ -21,11 +25,13 @@ public class HelloController {
 
     /**
      * 如果404,请阅读 当前项目下的readme.md
+     *
      * @return
      */
     @RequestMapping("/hello")
     @ResponseBody
-    public String hello() {
+    public String hello(HttpServletRequest request, HttpServletResponse response, @RequestHeader("Host") String Host) {
+        System.out.println(Host);
         return "hello,success!!!";
     }
 }

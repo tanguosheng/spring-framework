@@ -41,7 +41,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
  */
 @Configuration
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
-
+    public DelegatingWebMvcConfiguration() {
+        System.out.println("DelegatingWebMvcConfiguration new...");
+    }
 	private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
 
 

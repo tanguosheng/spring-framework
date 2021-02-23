@@ -96,7 +96,8 @@ dependencies {
 	testCompile("javax.mail:javax.mail-api:1.6.1")
 }
 
-eclipse.project {
-	natures += "org.eclipse.ajdt.ui.ajnature"
-	buildCommands = [new org.gradle.plugins.ide.eclipse.model.BuildCommand("org.eclipse.ajdt.core.ajbuilder")]
-}
+// 我们大多使用的是idea,不是用的eclipse编译.所以注释这个.
+//eclipse.project {
+//	natures += "org.eclipse.ajdt.ui.ajnature"
+//	buildCommands = [new org.gradle.plugins.ide.eclipse.model.BuildCommand("org.eclipse.ajdt.core.ajbuilder")]
+//}
