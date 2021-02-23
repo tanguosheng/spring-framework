@@ -65,7 +65,8 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
         // 1、模板方法:创建spring-web根应用程序上线文:WebApplicationContext.
 		WebApplicationContext rootAppContext = createRootApplicationContext();
 		if (rootAppContext != null) {
-            // 2、将其包装成一个servlet规范中的监听器.
+            // 2、[重要]注册用于初始化root ioc容器的servlet应用监听器.(在servlet容器初始化完毕之后,在所有filter、servlet初始化之前,会调用监听器的contextInitialized方法)
+            //          此类的contextInitialized方法就是去初始化 root ioc容器.[这对应之前在web.xml中配置的那个监听器]
             ContextLoaderListener listener = new ContextLoaderListener(rootAppContext);
 			listener.setContextInitializers(getRootApplicationContextInitializers());
 			// 3、把监听器注册到servlet上下文中.

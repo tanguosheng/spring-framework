@@ -20,6 +20,30 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
+ * <pre>
+ * 在springmvc 4.x时,此类需要配置在web.xml中:
+ * {@code
+ *     该类作为spring的listener使用，它会在创建时自动查找web.xml配置的applicationContext.xml文件
+ *     <listener>
+ *         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+ *     </listener>
+ * }
+ * 那此类的作用是?
+ * 1、此类实现了servlet规范的: {@link ServletContextListener},所以在web.xml中是用 listener 标签进行配置.
+ *    在servlet容器启动之后,会回调 {@link #contextInitialized(ServletContextEvent sce)} 方法
+ * 2、此方法会直接调用 {@link #initWebApplicationContext(javax.servlet.ServletContext)} 方法 —— 去初始化root ioc容器.
+ *
+ * 3、那其实就很明确了:
+ *    1) 此类的作用,就是在servlet容器启动完毕,回调监听器时[初始化root ioc容器]
+ *    2) 在 {@link org.springframework.web.servlet.DispatcherServlet#init} 方法被调用后,
+ *       最终会调用到 {@link org.springframework.web.servlet.FrameworkServlet#initServletBean()} 方法中,
+ *       此方法中会去 [初始化web ioc容器]
+ * 4、疑问:为什么初始化root ioc容器需要放到监听器中,而初始化web ioc容器需要放到servlet对象初始化时呢?
+ *     答:因为在spring的设计中,一个http容器(可以理解为一个tomcat进程)对应一个root ioc容器,
+ *        而一个web应用程序对应一个 {@link org.springframework.web.servlet.DispatcherServlet} 实例对象,又对应一个web ioc容器.
+ *        spring设计的ioc容器层次结构: https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-servlet-context-hierarchy
+ * </pre>
+ *
  * Bootstrap listener to start up and shut down Spring's root {@link WebApplicationContext}.
  * Simply delegates to {@link ContextLoader} as well as to {@link ContextCleanupListener}.
  *
@@ -96,10 +120,16 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 
 
 	/**
+     * servlet应用程序监听器:接收有关web应用程序初始化过程正在启动的通知。
+     * 在初始化Web应用程序中的任何过滤器或Servlet之前，所有ServletContextListener都会收到上下文初始化通知。
+     *
+     * 此方法做的事情:
 	 * Initialize the root web application context.
+     * 初始化root ioc容器
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
+	    // 初始化root ioc容器
 		initWebApplicationContext(event.getServletContext());
 	}
 
