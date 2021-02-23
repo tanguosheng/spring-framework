@@ -13,15 +13,15 @@ import java.lang.reflect.Proxy;
 
 /**
  * <pre>
- * ²âÊÔ&Ñ§Ï°jdk¶¯Ì¬´úÀí
- * 1¡¢Ê¹ÓÃProxy.newProxyInstance()·½·¨Éú³É´úÀí¶ÔÏó,´«ÈëÈı¸ö²ÎÊı:
- *    1)Àà¼ÓÔØÆ÷
- *    2)Ä¿±ê¶ÔÏóµÄ½Ó¿ÚÊı×é
- *      ±¸×¢:Ö±½ÓÊ¹ÓÃ target.getClass().getInterfaces() ¾ÍĞĞ
- *    3)ÊµÏÖInvocationHandlerµÄinvoke·½·¨.
- * 2¡¢µ÷ÓÃproxy´úÀí¶ÔÏóµÄÈÎºÎ·½·¨¶¼»á±»ÔöÇ¿;Ö±½Óµ÷ÓÃtargetÄ¿±ê¶ÔÏóµÄÈÎºÎ·½·¨,¶¼²»»á±»ÔöÇ¿.
- * 3¡¢¶¯Ì¬Éú³ÉµÄ´úÀíÀàclassÎÄ¼ş: ÔÚ[ÏîÄ¿¸ùÄ¿Â¼+°üÃû]ÎÄ¼ş¼ĞÖĞ.(Ö´ĞĞÒ»´Îmain·½·¨,²Å»áÉú³É)(Ä¿Ç°²»ÖªµÀÈçºÎĞŞ¸Ä³ÉÆäËûÄ¿Â¼.)
- *      ±¸×¢:ÔÚÉú³ÉµÄ´úÀí¶ÔÏóclassÎÄ¼şÖĞ¿ÉÒÔ¿´µ½,´úÀí¶ÔÏóÄÚ²¿ËùÓĞ·½·¨¶¼»áÈ¥µ÷ÓÃ {@link InvocationHandler#invoke} ·½·¨.
+ * æµ‹è¯•&å­¦ä¹ jdkåŠ¨æ€ä»£ç†
+ * 1ã€ä½¿ç”¨Proxy.newProxyInstance()æ–¹æ³•ç”Ÿæˆä»£ç†å¯¹è±¡,ä¼ å…¥ä¸‰ä¸ªå‚æ•°:
+ *    1)ç±»åŠ è½½å™¨
+ *    2)ç›®æ ‡å¯¹è±¡çš„æ¥å£æ•°ç»„
+ *      å¤‡æ³¨:ç›´æ¥ä½¿ç”¨ target.getClass().getInterfaces() å°±è¡Œ
+ *    3)å®ç°InvocationHandlerçš„invokeæ–¹æ³•.
+ * 2ã€è°ƒç”¨proxyä»£ç†å¯¹è±¡çš„ä»»ä½•æ–¹æ³•éƒ½ä¼šè¢«å¢å¼º;ç›´æ¥è°ƒç”¨targetç›®æ ‡å¯¹è±¡çš„ä»»ä½•æ–¹æ³•,éƒ½ä¸ä¼šè¢«å¢å¼º.
+ * 3ã€åŠ¨æ€ç”Ÿæˆçš„ä»£ç†ç±»classæ–‡ä»¶: åœ¨[é¡¹ç›®æ ¹ç›®å½•+åŒ…å]æ–‡ä»¶å¤¹ä¸­.(æ‰§è¡Œä¸€æ¬¡mainæ–¹æ³•,æ‰ä¼šç”Ÿæˆ)(ç›®å‰ä¸çŸ¥é“å¦‚ä½•ä¿®æ”¹æˆå…¶ä»–ç›®å½•.)
+ *      å¤‡æ³¨:åœ¨ç”Ÿæˆçš„ä»£ç†å¯¹è±¡classæ–‡ä»¶ä¸­å¯ä»¥çœ‹åˆ°,ä»£ç†å¯¹è±¡å†…éƒ¨æ‰€æœ‰æ–¹æ³•éƒ½ä¼šå»è°ƒç”¨ {@link InvocationHandler#invoke} æ–¹æ³•.
  * {@code
  * import com.atguigu.test.jdkProxy.LoginService;
  * import java.lang.reflect.InvocationHandler;
@@ -61,7 +61,7 @@ import java.lang.reflect.Proxy;
  *
  *     public final void login(String var1, String var2) throws  {
  *         try {
- *             super.h.invoke(this, m3, new Object[]{var1, var2});   // ¶¯Ì¬Éú³ÉµÄ´úÀíÀàÖĞµÄ´úÀí·½·¨,»áÖ±½Óµ÷ÓÃ{@link InvocationHandler#invoke}·½·¨.
+ *             super.h.invoke(this, m3, new Object[]{var1, var2});   // åŠ¨æ€ç”Ÿæˆçš„ä»£ç†ç±»ä¸­çš„ä»£ç†æ–¹æ³•,ä¼šç›´æ¥è°ƒç”¨{@link InvocationHandler#invoke}æ–¹æ³•.
  *         } catch (RuntimeException | Error var4) {
  *             throw var4;
  *         } catch (Throwable var5) {
@@ -94,15 +94,15 @@ import java.lang.reflect.Proxy;
  *     }
  * }
  * }
- * 4¡¢ÎªÊ²Ã´jdk¶¯Ì¬´úÀí,±ØĞëÊµÏÖ½Ó¿Ú?   °¢ÀïP7
- *    ´ğ:JAVAÓï·¨ÒªÇó[ÀàÊÇµ¥¼Ì³Ğ¡¢¶àÊµÏÖ].
- *       ´ÓÉÏÃæµÚÈıÌõ¿´µ½:´úÀíµÄ¶ÔÏóµÄÀàÒÑ¾­¼Ì³ĞÁËjava.lang.reflect.ProxyÀà,ËùÒÔÖ»ÄÜÒªÇó[±»´úÀíÀàtarget]ÊµÏÖ½Ó¿Ú.
- * 5¡¢jdk¶¯Ì¬´úÀíµÄÓÅµã:
- *     ÒÀÀµjdk±¾ÉíµÄapi.ÎŞĞèÒıÈëÆäËûjar°ü.
- * 6¡¢jdk¶¯Ì¬´úÀíµÄÈ±µã:
- *    ±ØĞëÒªÇóĞèÒª´úÀíµÄÀàÊµÏÖ×Ô½Ó¿Ú.¶Ô´úÂëÓĞÇÖÈëĞÔ.
- *    ĞÔÄÜ·½Ãæ,¾­¹ıjdk8ÓÅ»¯ºó,ÒÑ¾­ºÍcglib²î²»¶àÁË.
- * 7¡¢spring¹Ù·½ÓÃµÄjdk¶¯Ì¬´úÀíÊµÏÖµÄaopÔ´Âë: org.springframework.aop.framework.JdkDynamicAopProxy
+ * 4ã€ä¸ºä»€ä¹ˆjdkåŠ¨æ€ä»£ç†,å¿…é¡»å®ç°æ¥å£?   é˜¿é‡ŒP7
+ *    ç­”:JAVAè¯­æ³•è¦æ±‚[ç±»æ˜¯å•ç»§æ‰¿ã€å¤šå®ç°].
+ *       ä»ä¸Šé¢ç¬¬ä¸‰æ¡çœ‹åˆ°:ä»£ç†çš„å¯¹è±¡çš„ç±»å·²ç»ç»§æ‰¿äº†java.lang.reflect.Proxyç±»,æ‰€ä»¥åªèƒ½è¦æ±‚[è¢«ä»£ç†ç±»target]å®ç°æ¥å£.
+ * 5ã€jdkåŠ¨æ€ä»£ç†çš„ä¼˜ç‚¹:
+ *     ä¾èµ–jdkæœ¬èº«çš„api.æ— éœ€å¼•å…¥å…¶ä»–jaråŒ….
+ * 6ã€jdkåŠ¨æ€ä»£ç†çš„ç¼ºç‚¹:
+ *    å¿…é¡»è¦æ±‚éœ€è¦ä»£ç†çš„ç±»å®ç°è‡ªæ¥å£.å¯¹ä»£ç æœ‰ä¾µå…¥æ€§.
+ *    æ€§èƒ½æ–¹é¢,ç»è¿‡jdk8ä¼˜åŒ–å,å·²ç»å’Œcglibå·®ä¸å¤šäº†.
+ * 7ã€springå®˜æ–¹ç”¨çš„jdkåŠ¨æ€ä»£ç†å®ç°çš„aopæºç : org.springframework.aop.framework.JdkDynamicAopProxy
  * </pre>
  *
  * @author LiuXianfa
@@ -113,12 +113,12 @@ public class MyJdkDynamicProxyTest implements AopProxy, InvocationHandler {
 
 
     public static void main(String[] args) throws IOException {
-        // °Ñjdk¶¯Ì¬´úÀíÉú³ÉµÄ´úÀíÀàclassÎÄ¼ş,Ğ´µ½ [µ±Ç°ÏîÄ¿¸úÄ¿Â¼+°üÃû] Ä¿Â¼Àï.
-        // Ïê¼û:sun.misc.ProxyGenerator#saveGeneratedFiles
+        // æŠŠjdkåŠ¨æ€ä»£ç†ç”Ÿæˆçš„ä»£ç†ç±»classæ–‡ä»¶,å†™åˆ° [å½“å‰é¡¹ç›®è·Ÿç›®å½•+åŒ…å] ç›®å½•é‡Œ.
+        // è¯¦è§:sun.misc.ProxyGenerator#saveGeneratedFiles
         System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 
 
-        // ±»´úÀíµÄÔ­Ê¼¶ÔÏó,Ò²¿ÉÒÔ³ÉÎªÄ¿±ê¶ÔÏó
+        // è¢«ä»£ç†çš„åŸå§‹å¯¹è±¡,ä¹Ÿå¯ä»¥æˆä¸ºç›®æ ‡å¯¹è±¡
         MyJdkDynamicProxyTest myJdkDynamicProxyTest = new MyJdkDynamicProxyTest(new LoginServiceImpl());
         LoginService proxy = (LoginService) myJdkDynamicProxyTest.getProxy();
 
@@ -128,10 +128,10 @@ public class MyJdkDynamicProxyTest implements AopProxy, InvocationHandler {
 
 
         System.out.println();
-        System.out.println("Ö±½ÓÊ¹ÓÃ±»Ä¿±ê¶ÔÏóµ÷ÓÃlogin·½·¨:(Ã»ÓĞÔöÇ¿±»Ö´ĞĞ.)");
+        System.out.println("ç›´æ¥ä½¿ç”¨è¢«ç›®æ ‡å¯¹è±¡è°ƒç”¨loginæ–¹æ³•:(æ²¡æœ‰å¢å¼ºè¢«æ‰§è¡Œ.)");
         ((LoginService) myJdkDynamicProxyTest.getTargetObject()).login("lxf", "asdf");
 
-        // Éú²ú´úÀíÀàÎÄ¼ş
+        // ç”Ÿäº§ä»£ç†ç±»æ–‡ä»¶
         generateClassFile((LoginServiceImpl) myJdkDynamicProxyTest.getTargetObject());
     }
 
@@ -153,9 +153,9 @@ public class MyJdkDynamicProxyTest implements AopProxy, InvocationHandler {
     }
 
     /**
-     * Éú³É´úÀí¶ÔÏóµÄclassÎÄ¼ş.
+     * ç”Ÿæˆä»£ç†å¯¹è±¡çš„classæ–‡ä»¶.
      * <p>
-     * Ê¹ÓÃ {@code System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true"); } Ò²¿ÉÒÔ°ÑÉú³ÉµÄclassÎÄ¼şÊä³ö³öÀ´. Êä³öµÄclassÎÄ¼şÔÚ [µ±Ç°ÏîÄ¿¸úÄ¿Â¼+°üÃû] Ä¿Â¼Àï.
+     * ä½¿ç”¨ {@code System.setProperty("sun.misc.ProxyGenerator.saveGeneratedFiles", "true"); } ä¹Ÿå¯ä»¥æŠŠç”Ÿæˆçš„classæ–‡ä»¶è¾“å‡ºå‡ºæ¥. è¾“å‡ºçš„classæ–‡ä»¶åœ¨ [å½“å‰é¡¹ç›®è·Ÿç›®å½•+åŒ…å] ç›®å½•é‡Œ.
      *
      * @param target
      * @throws IOException
@@ -168,21 +168,21 @@ public class MyJdkDynamicProxyTest implements AopProxy, InvocationHandler {
         fileOutputStream.write($Proxies);
         fileOutputStream.flush();
         fileOutputStream.close();
-        System.out.println("Éú³É´úÀí¶ÔÏóproxyµÄÀà:" + filePath);
+        System.out.println("ç”Ÿæˆä»£ç†å¯¹è±¡proxyçš„ç±»:" + filePath);
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object invoke;
         try {
-            System.out.println("@Before"); // Ç°ÖÃÔöÇ¿
-            invoke = method.invoke(getTargetObject(), args); // ×¢ÒâÕâÀïinvoke·½·¨µÚÒ»¸ö²ÎÊı,Ê¹ÓÃµÄÊÇÄ¿±ê¶ÔÏótarget,¶ø²»ÊÇproxy¶ÔÏó.Èç¹ûÊ¹ÓÃproxy»á±¨´í
-            System.out.println("@AfterReturning"); // ÔÚÄ¿±ê·½·¨·µ»ØÖ®ºóÔöÇ¿
+            System.out.println("@Before"); // å‰ç½®å¢å¼º
+            invoke = method.invoke(getTargetObject(), args); // æ³¨æ„è¿™é‡Œinvokeæ–¹æ³•ç¬¬ä¸€ä¸ªå‚æ•°,ä½¿ç”¨çš„æ˜¯ç›®æ ‡å¯¹è±¡target,è€Œä¸æ˜¯proxyå¯¹è±¡.å¦‚æœä½¿ç”¨proxyä¼šæŠ¥é”™
+            System.out.println("@AfterReturning"); // åœ¨ç›®æ ‡æ–¹æ³•è¿”å›ä¹‹åå¢å¼º
         } catch (Exception e) {
-            System.err.println("@AfterThrowing         Exception:" + e.getMessage()); // ÔÚÄ¿±ê·½·¨Òì³£Ê±µÄÔöÇ¿
-            throw e;// Èç¹ûÄ¿±ê·½·¨µ÷ÓÃÒì³£,ĞèÒª°ÑÒì³£Å×³öÈ¥.
+            System.err.println("@AfterThrowing         Exception:" + e.getMessage()); // åœ¨ç›®æ ‡æ–¹æ³•å¼‚å¸¸æ—¶çš„å¢å¼º
+            throw e;// å¦‚æœç›®æ ‡æ–¹æ³•è°ƒç”¨å¼‚å¸¸,éœ€è¦æŠŠå¼‚å¸¸æŠ›å‡ºå».
         } finally {
-            System.out.println("@After"); // ºóÖÃÔöÇ¿
+            System.out.println("@After"); // åç½®å¢å¼º
         }
         return invoke;
     }
@@ -206,6 +206,6 @@ class LoginServiceImpl implements LoginService {
 
     @Override
     public void login(String userName, String pwd) {
-        System.out.println("µ±Ç°µÇÂ¼ÓÃ»§ÃûÎª:" + userName);
+        System.out.println("å½“å‰ç™»å½•ç”¨æˆ·åä¸º:" + userName);
     }
 }

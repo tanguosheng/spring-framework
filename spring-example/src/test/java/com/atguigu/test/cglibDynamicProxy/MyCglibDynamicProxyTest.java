@@ -11,21 +11,21 @@ import java.lang.reflect.Method;
 
 /**
  * <pre>
- * ²âÊÔ&Ñ§Ï°Ê¹ÓÃcglibÊµÏÖ¶¯Ì¬´úÀí
- * 1¡¢Ê¹ÓÃcglib¶¯Ì¬´úÀíÔ­Àí:
- *    Ê¹ÓÃASMµ×²ã×Ö½ÚÂë²Ù×÷Àà¿â,¶¯Ì¬Éú³ÉµÄ´úÀí¶ÔÏóÎªÄ¿±ê¶ÔÏóµÄ×ÓÀà.
- *    ÔÚ×ÓÀàÖĞµÄËùÓĞ·½·¨ÖĞ,¶¼µ÷ÓÃ {@link MethodInterceptor} ·½·¨.
- *    ËùÒÔ ÎŞ·¨¶ÔfinalÀàºÍfinal·½·¨½øĞĞÔöÇ¿. ±¸×¢:{@link Enhancer#generateClass}ÖĞÅĞ¶ÏÁËsuperClassÈç¹ûÊÇfinalĞŞÊÎ,¾ÍÅ×³öÒì³£.
- * 2¡¢ÓÅµã:
- *      ÎŞĞèÒªÇó±»´úÀíÀàÊµÏÖ½Ó¿Ú.¶Ô´úÂëÇÖÈëĞÔ½ÏµÍ.
- * 3¡¢È±µã:
- *      ĞèÒªÒıÈëµ¥¶ÀµÄcglib°üºÍasm°üµÈ.×÷ÕßÖ»ÓĞÒ»¸öÈË.ºóĞø°æ±¾Éı¼¶Î¬»¤µÈ·½Ãæ,¿ÉÄÜÃ»ÓĞjdkÔ­Éú¶¯Ì¬´úÀíÓĞÓÅÊÆ.
- *      ÎŞ·¨¶ÔfinalÀàºÍfinal·½·¨½øĞĞÔöÇ¿.(ÒòÎªÊÇÉú³ÉµÄ×ÓÀà,finalÀàºÍfinal·½·¨¶¼²»ÄÜ±»ÖØĞ´.)
- * 4¡¢ĞÔÄÜ:
- *      ¾İËµºÍjdk8µÄ¶¯Ì¬´úÀí¶Ô±È,ĞÔÄÜ·½ÃæÒÑ¾­²î²»¶àÁË.
- * 5¡¢ÊÓÆµµØÖ·:https://www.bilibili.com/video/BV1SJ411v7fq
- * 6¡¢Ö´ĞĞ´Ë´úÂëÖ®ºó,»áÔÚ[ÏîÄ¿¸ùÄ¿Â¼ + /com/atguigu/test/cglibDynamicProxy/] Ä¿Â¼ÏÂÉú³É´úÀíÀàclassÎÄ¼ş.
- * 7¡¢´Ó¶¯Ì¬Éú³ÉµÄ´úÀíÀàclassÎÄ¼ş¿É¼û,´úÀí·½·¨ÊµÏÖÎª:
+ * æµ‹è¯•&å­¦ä¹ ä½¿ç”¨cglibå®ç°åŠ¨æ€ä»£ç†
+ * 1ã€ä½¿ç”¨cglibåŠ¨æ€ä»£ç†åŸç†:
+ *    ä½¿ç”¨ASMåº•å±‚å­—èŠ‚ç æ“ä½œç±»åº“,åŠ¨æ€ç”Ÿæˆçš„ä»£ç†å¯¹è±¡ä¸ºç›®æ ‡å¯¹è±¡çš„å­ç±».
+ *    åœ¨å­ç±»ä¸­çš„æ‰€æœ‰æ–¹æ³•ä¸­,éƒ½è°ƒç”¨ {@link MethodInterceptor} æ–¹æ³•.
+ *    æ‰€ä»¥ æ— æ³•å¯¹finalç±»å’Œfinalæ–¹æ³•è¿›è¡Œå¢å¼º. å¤‡æ³¨:{@link Enhancer#generateClass}ä¸­åˆ¤æ–­äº†superClasså¦‚æœæ˜¯finalä¿®é¥°,å°±æŠ›å‡ºå¼‚å¸¸.
+ * 2ã€ä¼˜ç‚¹:
+ *      æ— éœ€è¦æ±‚è¢«ä»£ç†ç±»å®ç°æ¥å£.å¯¹ä»£ç ä¾µå…¥æ€§è¾ƒä½.
+ * 3ã€ç¼ºç‚¹:
+ *      éœ€è¦å¼•å…¥å•ç‹¬çš„cglibåŒ…å’ŒasmåŒ…ç­‰.ä½œè€…åªæœ‰ä¸€ä¸ªäºº.åç»­ç‰ˆæœ¬å‡çº§ç»´æŠ¤ç­‰æ–¹é¢,å¯èƒ½æ²¡æœ‰jdkåŸç”ŸåŠ¨æ€ä»£ç†æœ‰ä¼˜åŠ¿.
+ *      æ— æ³•å¯¹finalç±»å’Œfinalæ–¹æ³•è¿›è¡Œå¢å¼º.(å› ä¸ºæ˜¯ç”Ÿæˆçš„å­ç±»,finalç±»å’Œfinalæ–¹æ³•éƒ½ä¸èƒ½è¢«é‡å†™.)
+ * 4ã€æ€§èƒ½:
+ *      æ®è¯´å’Œjdk8çš„åŠ¨æ€ä»£ç†å¯¹æ¯”,æ€§èƒ½æ–¹é¢å·²ç»å·®ä¸å¤šäº†.
+ * 5ã€è§†é¢‘åœ°å€:https://www.bilibili.com/video/BV1SJ411v7fq
+ * 6ã€æ‰§è¡Œæ­¤ä»£ç ä¹‹å,ä¼šåœ¨[é¡¹ç›®æ ¹ç›®å½• + /com/atguigu/test/cglibDynamicProxy/] ç›®å½•ä¸‹ç”Ÿæˆä»£ç†ç±»classæ–‡ä»¶.
+ * 7ã€ä»åŠ¨æ€ç”Ÿæˆçš„ä»£ç†ç±»classæ–‡ä»¶å¯è§,ä»£ç†æ–¹æ³•å®ç°ä¸º:
  * {@code
  *     public final void login(String var1, String var2) {
  *         MethodInterceptor var10000 = this.CGLIB$CALLBACK_0;
@@ -34,9 +34,9 @@ import java.lang.reflect.Method;
  *             var10000 = this.CGLIB$CALLBACK_0;
  *         }
  *
- *         if (var10000 != null) {     // Èç¹ûÄÜ»ñÈ¡µ½ MethodInterceptor ,¾Íµ÷ÓÃÆäÀ¹½Ø·½·¨.(À¹½Ø·½·¨ÖĞ¶¨ÒåÁËÇ°ºóÖÃµÈÔöÇ¿´¦Àí.)
+ *         if (var10000 != null) {     // å¦‚æœèƒ½è·å–åˆ° MethodInterceptor ,å°±è°ƒç”¨å…¶æ‹¦æˆªæ–¹æ³•.(æ‹¦æˆªæ–¹æ³•ä¸­å®šä¹‰äº†å‰åç½®ç­‰å¢å¼ºå¤„ç†.)
  *             var10000.intercept(this, CGLIB$login$0$Method, new Object[]{var1, var2}, CGLIB$login$0$Proxy);
- *         } else {                    // ·ñÔò¾ÍÖ±½Óµ÷ÓÃÄ¿±ê·½·¨(¼´¸¸ÀàÖĞµÄ·½·¨).
+ *         } else {                    // å¦åˆ™å°±ç›´æ¥è°ƒç”¨ç›®æ ‡æ–¹æ³•(å³çˆ¶ç±»ä¸­çš„æ–¹æ³•).
  *             super.login(var1, var2);
  *         }
  *     }
@@ -50,9 +50,9 @@ import java.lang.reflect.Method;
 public class MyCglibDynamicProxyTest implements AopProxy, MethodInterceptor {
     public static void main(String[] args) {
         String projectRootPath = new File("").getAbsolutePath();
-        System.out.println(String.format("»ñÈ¡µ±Ç°ÏîÄ¿¸ùÄ¿Â¼:[%s]", projectRootPath));
+        System.out.println(String.format("è·å–å½“å‰é¡¹ç›®æ ¹ç›®å½•:[%s]", projectRootPath));
 
-        // ¿ªÆô´úÀíÀàdebugÄ£Ê½:°ÑÉú³ÉµÄ´úÀíÀàclassÎÄ¼şÊä³öµ½Ö¸¶¨ÎÄ¼ş¼ĞÖĞ.
+        // å¼€å¯ä»£ç†ç±»debugæ¨¡å¼:æŠŠç”Ÿæˆçš„ä»£ç†ç±»classæ–‡ä»¶è¾“å‡ºåˆ°æŒ‡å®šæ–‡ä»¶å¤¹ä¸­.
         System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, projectRootPath);
 
 
@@ -73,7 +73,7 @@ public class MyCglibDynamicProxyTest implements AopProxy, MethodInterceptor {
         Object result;
         try {
             System.out.println("@Before");
-            result = methodProxy.invokeSuper(o, args);// µ÷ÓÃ¸¸Àà·½·¨.ÒòÎªcglibÊµÏÖÔ­Àí¾ÍÊÇ¶¯Ì¬Éú³ÉÒ»¸öÄ¿±ê¶ÔÏóµÄ×ÓÀà.
+            result = methodProxy.invokeSuper(o, args);// è°ƒç”¨çˆ¶ç±»æ–¹æ³•.å› ä¸ºcglibå®ç°åŸç†å°±æ˜¯åŠ¨æ€ç”Ÿæˆä¸€ä¸ªç›®æ ‡å¯¹è±¡çš„å­ç±».
             System.out.println("@AfterReturning");
         } catch (Exception e) {
             System.out.println("@AfterThrwoing");
@@ -114,6 +114,6 @@ public class MyCglibDynamicProxyTest implements AopProxy, MethodInterceptor {
 
 class LoginService {
     public void login(String userName, String pwd) {
-        System.out.println("µ±Ç°µÇÂ¼ÓÃ»§Ãû:" + userName);
+        System.out.println("å½“å‰ç™»å½•ç”¨æˆ·å:" + userName);
     }
 }

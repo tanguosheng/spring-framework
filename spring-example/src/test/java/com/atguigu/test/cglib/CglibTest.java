@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 public class CglibTest {
 
     public void run() {
-        System.out.println("这是run方法,执行业务逻辑.");
+        System.out.println("杩欐槸run鏂规硶,鎵ц涓氬姟閫昏緫.");
     }
 
 
@@ -31,8 +31,8 @@ public class CglibTest {
                 Object o1 = methodProxy.invokeSuper(obj, args);
                 System.out.println("after method run...");
 
-                System.out.println("方法执行返回值为:" + o1);
-                System.out.println(String.format("执行方法所用时间为:%s毫秒", (System.currentTimeMillis() - l)));
+                System.out.println("鏂规硶鎵ц杩斿洖鍊间负:" + o1);
+                System.out.println(String.format("鎵ц鏂规硶鎵�鐢ㄦ椂闂翠负:%s姣", (System.currentTimeMillis() - l)));
                 return o1;
             }
         });

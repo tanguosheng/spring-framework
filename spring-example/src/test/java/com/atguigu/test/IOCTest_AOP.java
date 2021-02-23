@@ -12,7 +12,7 @@ public class IOCTest_AOP {
     public void test01() {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(MainConfigOfAOP.class);
 
-        //1¡¢²»Òª×Ô¼º´´½¨¶ÔÏó,×Ô¼ºnewµÄ¶ÔÏó²»»áÖ´ĞĞÔöÇ¿·½·¨.
+        //1ã€ä¸è¦è‡ªå·±åˆ›å»ºå¯¹è±¡,è‡ªå·±newçš„å¯¹è±¡ä¸ä¼šæ‰§è¡Œå¢å¼ºæ–¹æ³•.
 //		MathCalculator mathCalculator = new MathCalculator();
 //		mathCalculator.div(1, 1);
         MathCalculator mathCalculator = (MathCalculator) applicationContext.getBean("calculator");
