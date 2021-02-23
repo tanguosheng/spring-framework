@@ -26,6 +26,10 @@ idea -> Preferences | Build, Execution, Deployment | Build Tools | Gradle 配置
 
 jdk版本为1.8， 我的为1.8.0_161-b12，可以编译成功
 
+在编译时可以使用 gradle -x test clean build 跳过测试代码运行,可以加快打包速度.
+![image-20210223194406123](images/image-20210223194406123.png)
+
+
 跑一下 build.gradle，等到片刻 即可... 
 
 P.s.: 此源码编译配置和官方不完全一致，有适当的增删
