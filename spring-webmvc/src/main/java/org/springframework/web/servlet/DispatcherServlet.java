@@ -1280,8 +1280,9 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 		if (exMv != null) {
-            // 如果通过异常解析出来的ModelAndView不是null,但是viewName和model数据都是空的,则返回null
-            // 作用:对于@ResponseBody注解的异常解析器,在resolveException()方法中可以使用response把数据直接write出去,返回值:return new ModelAndView();
+            // note:如果通过异常解析出来的ModelAndView不是null,但是viewName和model数据都是空的,则返回null
+            //  作用:对于@ResponseBody注解的异常解析器,在resolveException()方法中可以使用response把数据直接write出去,返回值:return new ModelAndView();
+            //      也可使用此机制,实现拦截器的异常解析器.
 			if (exMv.isEmpty()) {
 				request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 				return null;
