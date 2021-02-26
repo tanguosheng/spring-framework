@@ -971,6 +971,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Determine handler adapter for the current request.
+                // 通过请求处理器,找到支持的处理器适配器:作用:用于调用处理器的方法.
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -986,19 +987,26 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+                // 执行拦截器的preHandle方法:如果任意拦截器返回false,在内部执行完afterCompletion方法后,当前http请求处理结束.
+                // [疑问]spring拦截器preHandle方法如果抛出异常，会不会被异常解析器解析？
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
 				// Actually invoke the handler.
-                // 调用请求处理器   todo:疑问:对于 @ResponseBody 的请求,返回值为null 详见: RequestMappingHandlerAdapter#getModelAndView
+                // 用处理器适配器去调用目标方法
+                //  对于 @ResponseBody 的请求,mv返回值为null 详见: RequestMappingHandlerAdapter#getModelAndView
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
 
+                // 设置默认视图名称
 				applyDefaultViewName(processedRequest, mv);
+
+				// 触发拦截器的postHandle()后置方法
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1009,9 +1017,13 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+
+			// 处理需要转发的请求,并[触发拦截器的afterCompletion方法].
+            //  这里容易混淆的地方:上面两个catch并没有把异常再次抛出,而是赋值给变量.所以拦截器的preHandle方法或目标方法如果抛异常,这里也会被执行的.
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
+		    // 触发afterCompletion方法  (上面几行的processDispatchResult()方法发生异常时,才会进入这里)
 			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
 		}
 		catch (Throwable err) {
@@ -1022,6 +1034,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				// Instead of postHandle and afterCompletion
 				if (mappedHandler != null) {
+				    // 触发异步拦截器的afterConcurrentHandlingStarted方法.
 					mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
 				}
 			}
@@ -1063,9 +1076,12 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 			else {
 				Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);
-				mv = processHandlerException(request, response, handler, exception);
-				errorView = (mv != null);
-			}
+                // 【异常解析器,解析异常返回ModelAndView】如果无法解析异常,还需要把这个异常抛出去.
+                mv = processHandlerException(request, response, handler, exception);
+                errorView = (mv != null);
+                // note:【面试题】如果拦截器中抛出的异常是否可以使用[异常解析器]来处理?如果可以处理的话,应该如何实现呢?如果不可以说出原因?
+                // note:【面试题】如果拦截器抛出异常有code和message,需要把两个字段以{"code":xx,"message":"xxxxx"}的格式response,则如何实现?
+            }
 		}
 
 		// Did the handler return a view to render?
@@ -1087,6 +1103,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			return;
 		}
 
+		// 触发拦截器的afterCompletion方法
 		if (mappedHandler != null) {
 			mappedHandler.triggerAfterCompletion(request, response, null);
 		}
@@ -1263,6 +1280,8 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 		if (exMv != null) {
+            // 如果通过异常解析出来的ModelAndView不是null,但是viewName和model数据都是空的,则返回null
+            // 作用:对于@ResponseBody注解的异常解析器,在resolveException()方法中可以使用response把数据直接write出去,返回值:return new ModelAndView();
 			if (exMv.isEmpty()) {
 				request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 				return null;
@@ -1383,6 +1402,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		if (mappedHandler != null) {
 			mappedHandler.triggerAfterCompletion(request, response, ex);
 		}
+		// 执行完afterCompletion方法之后,再抛出异常.
 		throw ex;
 	}
 

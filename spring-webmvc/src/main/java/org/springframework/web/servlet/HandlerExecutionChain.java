@@ -133,10 +133,12 @@ public class HandlerExecutionChain {
 		if (!ObjectUtils.isEmpty(interceptors)) {
 			for (int i = 0; i < interceptors.length; i++) {
 				HandlerInterceptor interceptor = interceptors[i];
+                // 可以看到这里如果preHandle方法抛出异常,只能在外层方法的processDispatchResult()方法中触发拦截器的afterCompletion()方法了.
 				if (!interceptor.preHandle(request, response, this.handler)) {
 					triggerAfterCompletion(request, response, null);
 					return false;
 				}
+				// 记录已经执行的拦截器索引:在执行拦截器的afterCompletion方法时需要倒序执行已放行的拦截器的afterCompletion方法
 				this.interceptorIndex = i;
 			}
 		}
@@ -153,6 +155,8 @@ public class HandlerExecutionChain {
 
 		HandlerInterceptor[] interceptors = getInterceptors();
 		if (!ObjectUtils.isEmpty(interceptors)) {
+            // 如果方法执行到这里,说明所有拦截器的preHandle方法都正常执行完毕,目标方法也执行完毕,
+            //  此时倒序遍历拦截器并调用postHandle即可.(也是这里实现了拦截器调用顺序)
 			for (int i = interceptors.length - 1; i >= 0; i--) {
 				HandlerInterceptor interceptor = interceptors[i];
 				interceptor.postHandle(request, response, this.handler, mv);
@@ -170,12 +174,14 @@ public class HandlerExecutionChain {
 
 		HandlerInterceptor[] interceptors = getInterceptors();
 		if (!ObjectUtils.isEmpty(interceptors)) {
+            // 这里在执行afterCompletion方法时,使用倒序遍历拦截器.从而让拦截器的调用顺序和javax.servlet.Filter执行顺序相同.
 			for (int i = this.interceptorIndex; i >= 0; i--) {
 				HandlerInterceptor interceptor = interceptors[i];
 				try {
 					interceptor.afterCompletion(request, response, this.handler, ex);
 				}
 				catch (Throwable ex2) {
+				    // 这里使用catch也是保证了后续所有afterCompletion都可以依次正常执行完毕.
 					logger.error("HandlerInterceptor.afterCompletion threw exception", ex2);
 				}
 			}
