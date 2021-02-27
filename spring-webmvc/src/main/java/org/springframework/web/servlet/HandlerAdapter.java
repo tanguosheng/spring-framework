@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
+ * 【适配器模式】处理器适配器
  * MVC framework SPI, allowing parameterization of the core MVC workflow.
  *
  * <p>Interface that must be implemented for each handler type to handle a request.
@@ -65,6 +66,11 @@ public interface HandlerAdapter {
 	/**
 	 * Use the given handler to handle this request.
 	 * The workflow that is required may vary widely.
+     *
+     * 【适配器模式】处理器适配器 作用:
+     * 由于不同的处理器handler的工作流程可能相差很大,所以需要使用对应的处理器适配器去进行适配.
+     * 使用给定的处理器handler来处理此请求.
+     *
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @param handler handler to use. This object must have previously been passed

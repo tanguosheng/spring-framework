@@ -128,22 +128,27 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+        // 参数绑定:获取处理器目标方法参数数组
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
-			logger.trace("Invoking '" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +
-					"' with arguments " + Arrays.toString(args));
+			logger.trace("Invoking '" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) + "' with arguments " + Arrays.toString(args));
 		}
+		// 调用目标方法
 		Object returnValue = doInvoke(args);
 		if (logger.isTraceEnabled()) {
-			logger.trace("Method [" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +
-					"] returned [" + returnValue + "]");
+			logger.trace("Method [" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) + "] returned [" + returnValue + "]");
 		}
 		return returnValue;
 	}
 
 	/**
 	 * Get the method argument values for the current request.
-     * 使用参数解析器,解析当前request的方法参数
+     * 使用参数解析器,解析需要调用的处理器目标方法参数
+     *
+     * @param request
+     * @param mavContainer
+     * @param providedArgs 提前提供的参数
+     * @return 解析
 	 */
 	private Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
@@ -153,14 +158,15 @@ public class InvocableHandlerMethod extends HandlerMethod {
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+            // 尝试从提供的参数数组中解析方法参数
 			args[i] = resolveProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {
 				continue;
 			}
+            // 使用参数解析器解析方法参数
 			if (this.argumentResolvers.supportsParameter(parameter)) {
 				try {
-					args[i] = this.argumentResolvers.resolveArgument(
-							parameter, mavContainer, request, this.dataBinderFactory);
+					args[i] = this.argumentResolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
 					continue;
 				}
 				catch (Exception ex) {
@@ -171,9 +177,8 @@ public class InvocableHandlerMethod extends HandlerMethod {
 				}
 			}
 			if (args[i] == null) {
-				throw new IllegalStateException("Could not resolve method parameter at index " +
-						parameter.getParameterIndex() + " in " + parameter.getExecutable().toGenericString() +
-						": " + getArgumentResolutionErrorMessage("No suitable resolver for", i));
+			    // 目标方法的参数没有被解析出来,则抛出异常.Could not resolve method.
+				throw new IllegalStateException("Could not resolve method parameter at index : " + getArgumentResolutionErrorMessage("No suitable resolver for", i));
 			}
 		}
 		return args;

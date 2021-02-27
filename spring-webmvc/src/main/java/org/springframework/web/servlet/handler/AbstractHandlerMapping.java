@@ -40,6 +40,7 @@ import org.springframework.web.cors.CorsProcessor;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.DefaultCorsProcessor;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
@@ -76,6 +77,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	private final List<Object> interceptors = new ArrayList<>();
 
+    /**
+     * 适配的拦截器
+     *
+     * 对于 {@link WebRequestInterceptor}拦截器进行适配.
+     */
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<>();
 
 	private final UrlBasedCorsConfigurationSource globalCorsConfigSource = new UrlBasedCorsConfigurationSource();
@@ -276,6 +282,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #adaptInterceptor
 	 */
 	protected void initInterceptors() {
+	    // 当前类是 ApplicationContextAware 的子类.所以在 setApplicationContext()方法被调用时,当前方法会被调用.
 		if (!this.interceptors.isEmpty()) {
 			for (int i = 0; i < this.interceptors.size(); i++) {
 				Object interceptor = this.interceptors.get(i);
@@ -288,7 +295,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
-	 * Adapt the given interceptor object to the {@link HandlerInterceptor} interface.
+	 * Adapt(适应) the given interceptor object to the {@link HandlerInterceptor} interface.
 	 * <p>By default, the supported interceptor types are {@link HandlerInterceptor}
 	 * and {@link WebRequestInterceptor}. Each given {@link WebRequestInterceptor}
 	 * will be wrapped in a {@link WebRequestHandlerInterceptorAdapter}.
@@ -304,6 +311,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			return (HandlerInterceptor) interceptor;
 		}
 		else if (interceptor instanceof WebRequestInterceptor) {
+		    // 把所有 WebRequestInterceptor 包装成 WebRequestHandlerInterceptorAdapter.
 			return new WebRequestHandlerInterceptorAdapter((WebRequestInterceptor) interceptor);
 		}
 		else {
@@ -416,12 +424,14 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #getAdaptedInterceptors()
 	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+        // note:这里每个request都会对应一个 HandlerExecutionChain 实例对象.并没有使用缓存.
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
 
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request);
 		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
 			if (interceptor instanceof MappedInterceptor) {
+			    // 我们使用        registry.addInterceptor(new MyInterceptor()).addPathPatterns("/*"); 注册的拦截器都会包装成 MappedInterceptor
 				MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;
 				if (mappedInterceptor.matches(lookupPath, this.pathMatcher)) {
 					chain.addInterceptor(mappedInterceptor.getInterceptor());

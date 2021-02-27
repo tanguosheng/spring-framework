@@ -50,6 +50,14 @@ public final class MappedInterceptor implements HandlerInterceptor {
 	@Nullable
 	private final String[] excludePatterns;
 
+    /**
+     * <pre>
+     * 下面代码中的 interceptor 的对象:
+     *
+     * HandlerInterceptor interceptor = new MyInterceptor();
+     * registry.addInterceptor(interceptor).addPathPatterns("/*");
+     * </pre>
+     */
 	private final HandlerInterceptor interceptor;
 
 	@Nullable
