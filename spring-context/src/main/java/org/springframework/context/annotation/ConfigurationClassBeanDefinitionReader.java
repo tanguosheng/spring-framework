@@ -109,8 +109,8 @@ class ConfigurationClassBeanDefinitionReader {
 
 
 	/**
-	 * Read {@code configurationModel}, registering bean definitions
-	 * with the registry based on its contents.
+	 * Read {@code configurationModel}, registering bean definitions with the registry based on its contents.
+     * note:解析配置类,加载bean定义
 	 */
 	public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
 		TrackedConditionEvaluator trackedConditionEvaluator = new TrackedConditionEvaluator();
@@ -138,6 +138,7 @@ class ConfigurationClassBeanDefinitionReader {
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+        // 使用配置类中带有@Bean注解的方法,解析bean定义.
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
@@ -265,6 +266,8 @@ class ConfigurationClassBeanDefinitionReader {
 			logger.debug(String.format("Registering bean definition for @Bean method %s.%s()",
 					configClass.getMetadata().getClassName(), beanName));
 		}
+
+		// 注册bean定义.
 		this.registry.registerBeanDefinition(beanName, beanDefToRegister);
 	}
 

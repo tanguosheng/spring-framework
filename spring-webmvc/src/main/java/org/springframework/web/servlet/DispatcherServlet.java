@@ -581,8 +581,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
 
+        // 是否探测所有的 HandlerMapping (包含祖先容器中的bean)
 		if (this.detectAllHandlerMappings) {
 			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+            // 从ioc容器和祖先容器中找到所有 HandlerMapping 的bean. 这些bean是在 WebMvcConfigurationSupport#requestMappingHandlerMapping 中'注册'到ioc容器的.
 			Map<String, HandlerMapping> matchingBeans =
 					BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
 			if (!matchingBeans.isEmpty()) {
@@ -845,6 +847,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			for (String className : classNames) {
 				try {
 					Class<?> clazz = ClassUtils.forName(className, DispatcherServlet.class.getClassLoader());
+                    // 这里创建的bean是prototype的,没有把bean放到spring 单例缓存中中.
 					Object strategy = createDefaultStrategy(context, clazz);
 					strategies.add((T) strategy);
 				}

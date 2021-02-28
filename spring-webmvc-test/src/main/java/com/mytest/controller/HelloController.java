@@ -1,8 +1,10 @@
 package com.mytest.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +16,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RestController
 public class HelloController {
+
+
+    @Autowired
+    RequestMappingHandlerMapping handlerMapping;
+
 
     public HelloController() {
         System.out.println("init");

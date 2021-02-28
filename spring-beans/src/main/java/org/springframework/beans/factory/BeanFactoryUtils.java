@@ -314,6 +314,9 @@ public abstract class BeanFactoryUtils {
 	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
 	 * eagerly initialized to determine their type: So be aware that passing in "true"
 	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+     *
+     * 从ioc容器和祖先容器中找到 {@code type} 类型的bean
+     *
 	 * @return the Map of matching bean instances, or an empty Map if none
 	 * @throws BeansException if a bean could not be created
 	 * @see ListableBeanFactory#getBeansOfType(Class, boolean, boolean)

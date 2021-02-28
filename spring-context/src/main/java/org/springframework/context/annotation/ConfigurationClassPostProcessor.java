@@ -84,7 +84,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.CONFI
  * @author Phillip Webb
  * @since 3.0
  */
-public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
+public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor, // note:在 invokeBeanFactoryPostProcessors(beanFactory);方法中被调用.
 		PriorityOrdered, ResourceLoaderAware, BeanClassLoaderAware, EnvironmentAware {
 
 	private static final String IMPORT_REGISTRY_BEAN_NAME =
@@ -113,6 +113,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	private final Set<Integer> factoriesPostProcessed = new HashSet<>();
 
+    /**
+     * note:使用这个[bean定义读取器]来读取带有 @Configuration 注解的配置类.
+     */
 	@Nullable
 	private ConfigurationClassBeanDefinitionReader reader;
 
