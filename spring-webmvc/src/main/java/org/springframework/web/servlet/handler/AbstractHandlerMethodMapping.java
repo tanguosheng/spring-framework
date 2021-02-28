@@ -44,6 +44,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 /**
  * Abstract base class for {@link HandlerMapping} implementations that define
@@ -188,8 +189,8 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
      * todo:疑问:当前bean初始化完毕后的时候,调用afterPropertiesSet()方法时,就说明所有的controller都已经在ioc容器中了?
      *  如果说当前bean初始化完毕时,ioc容器中还没有把所有的controller都初始化完毕,那这不就有问题了?
      *  所以问题来了:spring是如何保证加载顺序的?
-     *  探索:在new这个对象时,都会调用 setOrder(0) 设置order = 0.    这order=0有什么特殊的地方吗?    深入探索结果:不是通过order=0来实现的.
-     *  而是使用 {@link org.springframework.web.servlet.FrameworkServlet.ContextRefreshListener} 这个'上线文加载完毕监听器'来实现的.
+     *  [探索]:在new这个对象时,都会调用 setOrder(0) 设置order = 0.    这order=0有什么特殊的地方吗?    深入探索结果:不是通过order=0来实现的.
+     *  [解答]:而是使用 {@link org.springframework.web.servlet.FrameworkServlet.ContextRefreshListener} 这个'上线文加载完毕监听器'来实现的.
 	 */
 	@Override
 	public void afterPropertiesSet() {
@@ -214,6 +215,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(obtainApplicationContext(), Object.class) :
 				obtainApplicationContext().getBeanNamesForType(Object.class));
 
+        // 遍历所有的bean
 		for (String beanName : beanNames) {
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
 				Class<?> beanType = null;
@@ -227,7 +229,8 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 					}
 				}
 				if (beanType != null && isHandler(beanType)) {
-					detectHandlerMethods(beanName);
+					// 探测 处理器方法
+				    detectHandlerMethods(beanName);
 				}
 			}
 		}
@@ -236,7 +239,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 	/**
 	 * Look for handler methods in the specified handler bean.
-	 * @param handler either a bean name or an actual handler instance
+     *
+     * 从指定的处理器bean中,寻找(look for)/探测(detect)处理器方法
+     *
+	 * @param handler either a bean name or an actual handler instance 一个处理器实例或者一个处理器beanName
 	 * @see #getMappingForMethod
 	 */
 	protected void detectHandlerMethods(Object handler) {
@@ -248,7 +254,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
-							return getMappingForMethod(method, userType);
+                            return getMappingForMethod(method, userType);// 返回请求映射信息.从方法和类上解析 @RequestMapping 注解.
 						}
 						catch (Throwable ex) {
 							throw new IllegalStateException("Invalid mapping on handler class [" +
@@ -260,8 +266,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
-				registerHandlerMethod(handler, invocableMethod, mapping);
-			});
+                // 注册处理器方法
+                registerHandlerMethod(handler, invocableMethod, mapping);
+                // mapping 可以使用这种方式手动创建:RequestMappingInfo mapping = RequestMappingInfo.paths("/hello").build();
+            });
 		}
 	}
 

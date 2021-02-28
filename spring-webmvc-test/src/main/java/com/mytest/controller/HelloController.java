@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 public class HelloController {
 
 
-    @Autowired
-    RequestMappingHandlerMapping handlerMapping;
+//    @Autowired
+//    RequestMappingHandlerMapping handlerMapping;
 
 
     public HelloController() {

@@ -183,8 +183,9 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	/**
-	 * Uses method and type-level @{@link RequestMapping} annotations to create
-	 * the RequestMappingInfo.
+	 * Uses method and type-level @{@link RequestMapping} annotations to create the RequestMappingInfo.
+     * 使用方法和类上的 {@link RequestMapping}注解,去创建请求映射信息{@link RequestMappingInfo}
+     *
 	 * @return the created RequestMappingInfo, or {@code null} if the method
 	 * does not have a {@code @RequestMapping} annotation.
 	 * @see #getCustomMethodCondition(Method)
@@ -193,10 +194,13 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	@Override
 	@Nullable
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+        // 从方法上找到 @RequestMapping 注解,创建[请求映射信息 RequestMappingInfo]
 		RequestMappingInfo info = createRequestMappingInfo(method);
 		if (info != null) {
+		    // 从处理器类上找到 @RequestMapping 注解,创建[请求映射信息 RequestMappingInfo]
 			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType);
 			if (typeInfo != null) {
+			    // 合并类上和方法上的[请求映射信息 RequestMappingInfo]
 				info = typeInfo.combine(info);
 			}
 		}
