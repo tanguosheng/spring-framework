@@ -56,13 +56,22 @@ public class HandlerMethod {
 	/** Logger that is available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+    /**
+     * 处理器对应的bean
+     */
 	private final Object bean;
 
+    /**
+     * 如果传入的处理器是beanName,则还需要传入ioc容器(beanFactory),用于从spring容器中获取对应的处理器bean
+     */
 	@Nullable
 	private final BeanFactory beanFactory;
 
 	private final Class<?> beanType;
 
+    /**
+     * 处理器方法
+     */
 	private final Method method;
 
 	private final Method bridgedMethod;
