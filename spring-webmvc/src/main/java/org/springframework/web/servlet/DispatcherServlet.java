@@ -145,6 +145,8 @@ import org.springframework.web.util.WebUtils;
  * 3.0+ environments, which support programmatic registration of servlet instances.
  * See the {@link #DispatcherServlet(WebApplicationContext)} javadoc for details.
  *
+ * 【DispatcherServlet处理请求流程图:src\docs\images\DispatcherServlet.jpg】
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
