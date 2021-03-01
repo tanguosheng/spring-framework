@@ -157,6 +157,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private WebBindingInitializer webBindingInitializer;
 
+    /**
+     * 异步任务执行器
+     *  异步接口工作原理: 详见:{@link com.mytest.controller.HelloController#asyncHello()}
+     *
+     */
 	private AsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor("MvcAsync");
 
 	@Nullable
