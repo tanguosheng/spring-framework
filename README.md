@@ -4,8 +4,9 @@
 
 # <img src="src/docs/asciidoc/images/spring-framework.png" width="80" height="80"> Spring Framework
 
+# 如何导入idea：
 
-如何导入idea：
+## 下载 gradle 4.9
 
 用以下链接下载 gradle 4.9 版本（radle-src为gralde源码，gradle-bin为安装包，gradle-all为源码加安装包）
 (idea 自带的 gradle 版本可能更新（5.0）或者更老，会有各种编译问题)
@@ -15,7 +16,8 @@ https://services.gradle.org/distributions/gradle-4.9-bin.zip
 
 
 
-配置环境变量：
+## 配置环境变量：
+
 GRADLE_HOME=/Users/***/tools/gradle-4.9
 Path引入环境变量，例子如下：
 PATH=$GRADLE_HOME/bin:$PATH:.
@@ -46,53 +48,24 @@ P.s.: 此源码编译配置和官方不完全一致，有适当的增删
 
 
 
-## 二、
+## 二、spring-aspects 模块编译的时候，找不到符号
 
+报错信息：
 
+```
+D:\WorkSpaces\learn\tanguosheng\spring-framework\spring-aspects\src\main\java\org\springframework\cache\aspectj\AspectJCachingConfiguration.java:42:12
+java: 找不到符号
+  符号:   类 AnnotationCacheAspect
+  位置: 类 org.springframework.cache.aspectj.AspectJCachingConfiguration
+D:\WorkSpaces\learn\tanguosheng\spring-framework\spring-aspects\src\main\java\org\springframework\cache\aspectj\AspectJCachingConfiguration.java:43:9
+java: 找不到符号
+  符号:   类 AnnotationCacheAspect
+  位置: 类 org.springframework.cache.aspectj.AspectJCachingConfiguration
+D:\WorkSpaces\learn\tanguosheng\spring-framework\spring-aspects\src\main\java\org\springframework\cache\aspectj\AspectJCachingConfiguration.java:43:45
+java: 找不到符号
+  符号:   变量 AnnotationCacheAspect
+  位置: 类 org.springframework.cache.aspectj.AspectJCachingConfiguration
 
-This is the home of the Spring Framework, the foundation for all
-[Spring projects](https://spring.io/projects). Together the Spring Framework and the family of Spring projects make up what we call "Spring". 
+```
 
-Spring provides everything you need beyond the Java language to create enterprise
-applications in a wide range of scenarios and architectures. Please read the
-[Overview](https://docs.spring.io/spring/docs/current/spring-framework-reference/overview.html#spring-introduction)
-section in the reference for a more complete introduction.
-
-## Code of Conduct
-
-This project is governed by the [Spring Code of Conduct](CODE_OF_CONDUCT.adoc).
-By participating you are expected to uphold this code.
-Please report unacceptable behavior to spring-code-of-conduct@pivotal.io.
-
-## Access to Binaries
-
-For access to artifacts or a distribution zip, see the
-[Spring Framework Artifacts](https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-Artifacts)
-wiki page.
-
-## Documentation
-
-The Spring Frameworks maintains reference documentation
-([published](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/) and
-[source](src/docs/asciidoc)),
-Github [wiki pages](https://github.com/spring-projects/spring-framework/wiki), and an
-[API reference](https://docs.spring.io/spring-framework/docs/current/javadoc-api/).
-There are also [guides and tutorials](https://spring.io/guides) across Spring projects.
-
-## Build from Source
-
-See the [Build from Source](https://github.com/spring-projects/spring-framework/wiki/Build-from-Source)
-wiki page and also [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Stay in Touch
-
-Follow [@SpringCentral](https://twitter.com/springcentral),
-[@SpringFramework](https://twitter.com/springframework), and its
-[team members](https://twitter.com/springframework/lists/team/members) on Twitter.
-In-depth articles can be found at [The Spring Blog](https://spring.io/blog/),
-and releases are announced via our [news feed](https://spring.io/blog/category/news).
-
-## License
-
-The Spring Framework is released under version 2.0 of the
-[Apache License](https://www.apache.org/licenses/LICENSE-2.0).
+解决方案：https://blog.csdn.net/cs373616511/article/details/107833530
