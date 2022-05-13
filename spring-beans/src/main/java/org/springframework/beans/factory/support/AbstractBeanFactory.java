@@ -360,6 +360,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Guarantee initialization of beans that the current bean depends on.
 				// 保证当前bean依赖的bean的初始化。
+				// spring 高级功能，一般使用在 观察者模式 场景下。观察者 要早于 事件源 先创建，那么 观察者 dependsOn 事件源
+				// 这样创建 事件源 前先创建 观察者，才不会因为 观察者 还未创建导致的早期事件被遗漏
+				// https://blog.csdn.net/qq_40837310/article/details/106557588
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
@@ -380,6 +383,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				// 创建bean实例
+				// 在Spring 2.0之前，有 singleton 和 prototype 两种；
+				// 在Spring 2.0之后，为支持 web 应用的 ApplicationContext，增强另外三种：
+				// request，session 和 global session 类型，它们只实用于 web 程序，通常是和 XmlWebApplicationContext 共同使用。
 				if (mbd.isSingleton()) {
 					// Singleton 的情况
 
@@ -392,7 +398,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							// eagerly by the creation process, to allow for circular reference resolution.
 							// Also remove any beans that received a temporary reference to the bean.
 							// 从单例缓存中显式删除实例：它可能已经被创建过程急切地放在那里，以允许循环引用解析。
-							// 也删除任何接收到bean的临时引用的bean。
+							// 也
+							// 还除任何接收到bean的临时引用的bean。
 							destroySingleton(beanName);
 							throw ex;
 						}

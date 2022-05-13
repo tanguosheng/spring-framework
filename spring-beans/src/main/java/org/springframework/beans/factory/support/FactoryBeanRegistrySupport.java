@@ -132,6 +132,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 							beforeSingletonCreation(beanName);
 							try {
 								// 执行 BeanPostProcessor 的 postProcessAfterInitialization
+								// 这里会为 object 添加动态代理
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							} catch (Throwable ex) {
 								throw new BeanCreationException(beanName,
@@ -156,6 +157,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			if (shouldPostProcess) {
 				try {
 					// 执行 BeanPostProcessor 的 postProcessAfterInitialization
+					// 这里会为 object 添加动态代理
 					object = postProcessObjectFromFactoryBean(object, beanName);
 				} catch (Throwable ex) {
 					throw new BeanCreationException(beanName, "Post-processing of FactoryBean's object failed", ex);

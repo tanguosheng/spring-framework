@@ -192,10 +192,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
-            // 如果 一级缓存(singletonObjects)中不包含此beanName,才会
-            //     因为在一级缓存(singletonObjects)中的所有bean,已经经过了完整的spring声明周期,已经是一个完整的spring bean了.
+            // 如果一级缓存(singletonObjects)中不包含此 beanName 才会执行
+            // 因为在一级缓存(singletonObjects)中的所有bean,已经经过了完整的spring声明周期,已经是一个完整的spring bean了.
 			if (!this.singletonObjects.containsKey(beanName)) {
-				this.singletonFactories.put(beanName, singletonFactory);//
+				this.singletonFactories.put(beanName, singletonFactory);
 				this.earlySingletonObjects.remove(beanName);
 				this.registeredSingletons.add(beanName);
 			}
@@ -318,10 +318,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (newSingleton) {
 					// 到这里已经是创建完整的实例了，添加到一级缓存(singletonObjects)，移除其他级缓存
 
-					// 添加一级缓存(singletonObjects): 					this.singletonObjects.put(beanName, singletonObject);
-					// 移除三级缓存(singletonFactories): 					this.singletonFactories.remove(beanName);
-					// 移除二级缓存(earlySingletonObjects): 					this.earlySingletonObjects.remove(beanName);
-					// 记录已经注册到容器中bean的名字: 	this.registeredSingletons.add(beanName);
+					// 添加一级缓存(singletonObjects): 			this.singletonObjects.put(beanName, singletonObject);
+					// 记录已经注册到容器中bean的名字: 			this.registeredSingletons.add(beanName);
+					// 移除三级缓存(singletonFactories): 		this.singletonFactories.remove(beanName);
+					// 移除二级缓存(earlySingletonObjects): 		this.earlySingletonObjects.remove(beanName);
 					addSingleton(beanName, singletonObject); // spring bean
 				}
 			}

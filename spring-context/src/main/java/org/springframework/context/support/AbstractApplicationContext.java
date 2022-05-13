@@ -569,7 +569,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 2. 获取一个新的bean工厂(如果已经存在则refresh):然后使用新的bean工厂,解析所有的bean定义:loadBeanDefinitions()
+			// 2. 获取一个新的bean工厂(如果已经存在则refresh):
+			//    使用新的bean工厂, 解析所有的bean定义: loadBeanDefinitions()
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -699,6 +700,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		// 刷新BeanFactory
+		// @see: org.springframework.context.support.AbstractRefreshableApplicationContext.refreshBeanFactory
 		refreshBeanFactory();
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (logger.isDebugEnabled()) {

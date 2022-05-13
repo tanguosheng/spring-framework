@@ -132,7 +132,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			// 设置BeanFactory的序列化ID
 			beanFactory.setSerializationId(getId());
-			// 在customizeBeanFactory方法中设置两个布尔参数allowBeanDefinitionOverriding、allowCircularReferences
+			// 在customizeBeanFactory方法中设置两个布尔参数:
+			// allowBeanDefinitionOverriding 是否允许 BeanDefinition 覆盖
+			// allowCircularReferences 是否允许循环引用
 			customizeBeanFactory(beanFactory);
 			// 正式开始解析所有的bean定义.
 			loadBeanDefinitions(beanFactory);

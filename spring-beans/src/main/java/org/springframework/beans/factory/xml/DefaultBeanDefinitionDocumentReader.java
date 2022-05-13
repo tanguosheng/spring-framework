@@ -131,12 +131,12 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		BeanDefinitionParserDelegate parent = this.delegate;
 		/*
 		 * 在createDelegate方法中创建了BeanDefinitionParserDelegate对象，初始化委托对象时顺带着解析了:
-		 * default-lazy-init:			指定<beans>元素下配置的所有bean默认的延迟初始化行为
-		 * default-merge:				指定<beans>元素下配置的所有bean默认的merge行为
-		 * default-autowire:			指定<beans>元素下配置的所有bean默认的自动装配行为
-		 * default-init-method:			指定<beans>元素下配置的所有bean默认的初始化方法
-		 * default-destroy-method:		指定<beans>元素下配置的所有bean默认的回收方法
-		 * default-autowire-candidates:	指定<beans>元素下配置的所有bean默认是否作为自动装配的候选Bean
+		 * default-lazy-init:			指定<beans>元素下配置的所有bean默认的 延迟初始化行为
+		 * default-merge:				指定<beans>元素下配置的所有bean默认的 merge行为
+		 * default-autowire:			指定<beans>元素下配置的所有bean默认的 自动装配行为
+		 * default-init-method:			指定<beans>元素下配置的所有bean默认的 初始化方法
+		 * default-destroy-method:		指定<beans>元素下配置的所有bean默认的 回收方法
+		 * default-autowire-candidates:	指定<beans>元素下配置的所有bean默认的 是否作为自动装配的候选Bean
 		 */
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
@@ -337,9 +337,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-		// 委托BeanDefinitionParserDelegate进行元素解析，
-		// 返回的bdHolder持有GenericBeanDefinition对象，
-		// GenericBeanDefinition装着bean标签的class、name、id、aliases等属性值
+		// 委托 BeanDefinitionParserDelegate 进行元素解析，
+		// 返回的 bdHolder 持有 GenericBeanDefinition 对象，
+		// GenericBeanDefinition 装着 bean 标签的 class、name、id、aliases 等属性值
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			// 对默认标签下的自定义标签进行解析，比如:

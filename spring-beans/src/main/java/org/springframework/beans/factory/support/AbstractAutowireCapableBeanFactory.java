@@ -495,6 +495,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Prepare method overrides.
 		// 准备方法覆盖, lookup-method 或 replace-method 的情况
+		// lookup-method： 可以解决 单例 bean 引用 非单例 bean 的情况，
+		// 				   通过配置 lookup-method 标签指定 bean 中的某个方法，方法会被覆盖为返回一个 非单例 bean
+		//				   例如： <lookup-method name="getFruit" bean="banana"></lookup-method>
+		// replace-method 可以替换 bean 中的某个方法。新建一个 ReplaceXXX 类 继承 MethodReplacer，实现 reimplement 方法，添加配置：
+		// 				   <replaced-method name="sayHello" replacer="replaceDog">
+		//						<arg-type match="java.lang.String"></arg-type>
+		//				   </replaced-method>
 		try {
 			// 验证及准备覆盖的方法
 			mbdToUse.prepareMethodOverrides();
@@ -559,7 +566,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			// 使用适当的实例化策略为指定的bean创建新实例：factory 方法、构造函数自动装配或简单实例化。
+			// 使用适当的实例化策略为指定的bean创建新实例：factory 方法、构造函数自动装配 或 简单实例化。
 			// 这里返回的是一个装着 bean 实例的 BeanWrapper
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}

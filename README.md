@@ -69,3 +69,10 @@ java: 找不到符号
 ```
 
 解决方案：https://blog.csdn.net/cs373616511/article/details/107833530
+
+
+Xml 方式启动容器从这里开始看：
+org.springframework.context.support.ClassPathXmlApplicationContext.ClassPathXmlApplicationContext(java.lang.String[], boolean, org.springframework.context.ApplicationContext)
+
+初始化 Context 主体流程在：
+org.springframework.context.support.AbstractApplicationContext.refresh
